@@ -32,11 +32,7 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
                 injectable: 2
             },
 
-            // Enumeration for storing module types
-            MODULE_TYPE = {
-                singleton: 1,
-                transient: 2
-            };
+            factories = {};
 
         // Registration object for storing registered injectables
         var Registration = function (name, type, value) {
@@ -67,7 +63,7 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
             }
 
             function addRegistration (name, type, value) {
-                if (name === undefined || type === undefined) {
+                if (typeof name === "undefined" || typeof type === "undefined") {
                     throw new Error("Invalid registration");
                 }
 
@@ -80,7 +76,7 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
 
             function getRegistration (name) {
 
-                if (!name || typeof name != "string") {
+                if (!name || typeof name !== "string") {
                     console.warn("Invalid name provided");
                     return undefined;
                 }
@@ -94,7 +90,7 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
 
             function retrieveRegistrations (names) {
 
-                if (names === undefined || !isArray(names)) {
+                if (typeof names === "undefined" || !isArray(names)) {
                     throw new Error("Must provide at least one name");
                 }
 
@@ -117,7 +113,7 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
 
             function cloneObject (obj, deepClone) {
 
-                if (typeof obj != "object") {
+                if (typeof obj !== "object") {
                     throw new Error("Not an object");
                 }
 
@@ -145,7 +141,7 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
 
             function clone (obj, deepClone) {
 
-                if (obj === undefined) return obj;
+                if (typeof obj === "undefined") return obj;
 
                 deepClone = deepClone || false;
 
@@ -180,64 +176,64 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
             return registration.value;
         }
 
-        var Module = function (type, constructorFunction, dependencies, scope) {
+        var Module = function (factoryName, moduleConstructor, dependencies, scope) {
 
             function resolveDependencies() {
                 var resolutions = [];
-                if (dependencies !== undefined && isArray(dependencies)) {
-                    var registrations = Register.retrieve(dependencies);
+                if (typeof dependencies !== "undefined" && isArray(dependencies)) {
+                    var registrations = register.retrieve(dependencies);
                     for (var i = 0; i < registrations.length; i++) {
                         var registration = registrations[i];
                         resolutions.push(invokeRegistration(registration));
                     }
                 }
                 return resolutions;
-            };
+            }
 
-            function createInstance() {
+            function getFactory() {
+                if (factories.hasOwnProperty(factoryName)) {
+
+                    return factories[factoryName];
+                }
+            }
+
+            function getInstance () {
+
+                var factory = getFactory();
+
+                if (typeof factory.getInstance === "undefined") {
+                    throw new Error("Factory must contain a 'getInstance' method");
+                }
                 var args = resolveDependencies();
-                return constructorFunction.apply(scope, args);
-            };
-
-            var instance;
-            var getInstance = function () {
-                if (type === MODULE_TYPE.transient) {
-                    return createInstance();
-                }
-
-                if (instance === undefined) {
-                    instance = createInstance();
-                }
-                return instance;
-            };
+                return factory.getInstance(moduleConstructor, args, scope);
+            }
 
             return {
-                type: type,
                 getInstance: getInstance
             };
         };
 
-        function registerModule (name, type, constructorArray, scope) {
+        function registerModule (moduleName, factoryName, constructorArray, scope) {
 
-            if (name === undefined || !isArray(constructorArray)) {
-                throw new Error("Invalid singleton registration");
+            if (typeof moduleName === "undefined" || !isArray(constructorArray)) {
+                throw new Error("Invalid module registration");
             }
 
             if (constructorArray.length < 1) {
                 throw new Error("Module registration requires a constructor function");
             }
 
-            var constructorFunction = constructorArray.pop();
+            var moduleConstructor = constructorArray.pop();
 
-            if (typeof constructorFunction !== "function") {
+            if (typeof moduleConstructor !== "function") {
                 throw new Error("Last parameter of constructor array must be a constructor function");
             }
 
             scope = scope || self;
 
-            var module = new Module(type, constructorFunction, constructorArray, scope);
+            var module = new Module(factoryName, moduleConstructor, constructorArray, scope);
 
-            register.add(name, REGISTRATION_TYPE.module, module);
+            register.add(moduleName, REGISTRATION_TYPE.module, module);
         }
 
         function registerValue (name, value, deepClone) {
@@ -250,17 +246,23 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
             register.add(name, type, value);
         }
 
-        function registerSingleton (name, constructorArray, scope) {
-            registerModule(name, MODULE_TYPE.singleton, constructorArray, scope);
-        }
+        function registerFactory (factoryName, factory) {
 
-        function registerTransient (name, constructorArray, scope) {
-            registerModule(name, MODULE_TYPE.transient, constructorArray, scope);
+            if (typeof factoryName === "undefined" || typeof factory !== "function") {
+                throw new Error("A valid factory must be supplied")
+            }
+
+            factories[factoryName] = factory.call();
+            this[factoryName] = function(moduleName, constructorArray, scope) {
+                registerModule(moduleName, factoryName, constructorArray, scope);
+            }
+
+            console.dir(factories);
         }
 
         function resolve (names) {
 
-            var registrations = Register.retrieve([].concat(names));
+            var registrations = register.retrieve([].concat(names));
 
             if (registrations.length == 1) return invokeRegistration(registrations[0]);
 
@@ -286,26 +288,55 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
              };
         };
 
-        function init () {
-            registerReference("window", window);
-            registerReference("document", document);
-        };
-
-        init();
-
         return {
             ready: ready,
             value: registerValue,
             reference: registerReference,
-            singleton: registerSingleton,
-            transient: registerTransient,
+            factory: registerFactory,
             resolve: resolve
         };
 
     };
 
+    var defaultFactories = {
+        singleton: function () {
+
+            var instance;
+            function getInstance (moduleConstructor, args, scope) {
+                if (instance === undefined) {
+                    instance = moduleConstructor.apply(scope, args);
+                }
+                return instance;
+            }
+
+            return {
+                getInstance: getInstance
+            };
+        },
+
+        transient: function () {
+
+            function getInstance (moduleConstructor, args, scope) {
+                return moduleConstructor.apply(scope, args);
+            }
+
+            return {
+                getInstance: getInstance
+            };
+        }
+    }
+
     function expose() {
-        window.plug = new Plug();
+        var plug = new Plug();
+
+        for (var factoryName in defaultFactories) {
+            plug.factory(factoryName, defaultFactories[factoryName]);
+        }
+
+        plug.reference("window", window);
+        plug.reference("document", document);
+
+        window.plug = plug;
     }
 
     expose();
