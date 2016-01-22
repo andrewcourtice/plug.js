@@ -50,6 +50,7 @@ plug.singleton("module1", [ function() {
     return {
         saySomething: saySomething
     };
+    
 } ]);
 
 plug.singleton("module2", [ "module1", function(module1) {
@@ -73,6 +74,7 @@ Plug.js' factories allow you to customize how your modules get resolved. By defa
 
 ```javascript
 plug.factory("customResolver", function() {
+
     function getInstance(moduleConstructor, args, scope) {
         return moduleConstructor.apply(scope, args);
     }
@@ -82,7 +84,9 @@ plug.factory("customResolver", function() {
     }
 });
 
-plug.customResolver("module1", [ function() {} ]);
+plug.customResolver("module1", [ function() {
+    // Module code ...
+} ]);
 ```
 
 
