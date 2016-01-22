@@ -256,8 +256,6 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
             this[factoryName] = function(moduleName, constructorArray, scope) {
                 registerModule(moduleName, factoryName, constructorArray, scope);
             }
-
-            console.dir(factories);
         }
 
         function resolve (names) {
@@ -317,7 +315,8 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
         transient: function () {
 
             function getInstance (moduleConstructor, args, scope) {
-                return moduleConstructor.apply(scope, args);
+                args.unshift(scope);
+                return new (Function.prototype.bind.apply(moduleConstructor, args));
             }
 
             return {
@@ -327,6 +326,10 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
     }
 
     function expose() {
+        if (window.plug && window.plug instanceof Plug) {
+            return;
+        }
+
         var plug = new Plug();
 
         for (var factoryName in defaultFactories) {
