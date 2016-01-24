@@ -275,19 +275,7 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
             return resolution;
         }
 
-        function ready (callback) {
-
-             if (callback === undefined || typeof callback != "function") {
-                 throw new Error("Callback is not a function!");
-             }
-
-             window.onload = function() {
-                 callback.call(self);
-             };
-        };
-
         return {
-            ready: ready,
             value: registerValue,
             reference: registerReference,
             factory: registerFactory,
@@ -324,6 +312,8 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
             };
         }
     }
+
+
 
     function expose() {
         if (window.plug && window.plug instanceof Plug) {
