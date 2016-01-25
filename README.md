@@ -178,6 +178,19 @@ Injecting a variable by reference will inform Plug.js to treat the object normal
 
 ```
 
+## Resolving Registrations
+Plug.js uses a single method to resolve registered objects outside the context of a module constructor.
+
+```javascript
+var fooBar = plug.resolve("moduleOrVariableName")
+```
+or
+```javascript
+var fooBar = plug.resolve([ "module1", "module2", "value1", "module3" ])
+```
+
+Using the array method will return an object with each resolution as a property of the object, whereas the default string method will return the single resolution.
+
 
 ## Dependencies
 When registering a module you can define any other modules or registered variables that should be injected into your module.
