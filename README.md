@@ -1,6 +1,6 @@
 # Plug.js
 
-Plug.js is a lightweight JavaScript dependency injection and object life-cycle management library. The purpose of Plug.js is to provide a flexible way to connect modules and share data between them without polluting the global namespace.
+Plug.js is a lightweight JavaScript dependency injection and object life-cycle management library. The purpose of Plug.js is to provide a flexible way to connect modules and share data between them without requiring a hard dependency on a framework or a steep learning curve.
 
 With no dependencies on third-party libraries, Plug.js weighs in at just 3kb (minified).
 
@@ -26,7 +26,18 @@ First, download the Plug.js file or Plug.min.js (*recommended*) file and include
 
 To use Plug.js it's as simple as registering modules and variables. By default Plug.js provides two type of lifecycle factories (*explained below*): **singleton** and **transient**. A singleton registration will only a single instance of the registered module is ever resolved, while a transient registration will return a new instance of the module each time it is resolved.
 
+### Usage
+
+`plug.singleton(moduleName, [ injectionSignature ], scope)`
+
+| Argument | Type | Example | Required |
+| -------- | ---- | ------- | -------: |
+| moduleName | String | `"resourceModule"` | true |
+| injectionSignature | Array | `[ function () { ... } ] **or** [ "childModule", function(childModule) { ... } ]` | true |
+| scope | Object | `this` | false |
+
 #### Singleton
+
 ```javascript
 plug.singleton("singletonModule", [ function() {
 
