@@ -308,7 +308,8 @@
                 }
 
                 /* Map the dependencies */
-                var resolutions = dependencies.map(function (item) {
+                var registrations = register.retrieve(dependencies);
+                var resolutions = registrations.map(function (item) {
                     return invokeRegistration(item);
                 });
 
@@ -325,12 +326,15 @@
 
                 /* If the factory is registered then return it */
                 if (factories.hasOwnProperty(factoryName)) {
-                    return factories[factoryName];
+                    return new factories[factoryName]();
                 }
 
                 /* If not, throw an error and stop control flow */
                 throw new Error("Factory " + factoryName + " is not registered");
             }
+
+            /* Get the factory for this module */
+            var factory = getFactory();
 
             /**
              * Method to get an instance of the current module using its assigned factory
@@ -338,9 +342,6 @@
              * @return {Object}
              */
             function getInstance () {
-
-                /* Get the factory for this module */
-                var factory = getFactory();
 
                 /* Make sure the factory has a getInstance method */
                 if (typeof factory.getInstance === "undefined") {
@@ -446,7 +447,7 @@
             }
 
             /* Call the factory method and get it's return value */
-            factories[factoryName] = factory.call();
+            factories[factoryName] = factory;
 
             /* Create a new factory method on the current instance  for registering modules with this factory */
             this[factoryName] = function(moduleName, constructorArray, scope) {
@@ -506,9 +507,10 @@
 
              /* Implement the required getInstance method */
             function getInstance (moduleConstructor, args, scope) {
-                if (instance === undefined) {
+                if (typeof instance === "undefined") {
                     instance = moduleConstructor.apply(scope, args);
                 }
+
                 return instance;
             }
 
@@ -538,7 +540,7 @@
 
     /**
      * Method to initialize and expose an instance of plug
-     * 
+     *
      * @return {Undefined}
      */
     function expose() {
