@@ -1,9 +1,9 @@
 /*
 *   Plug.Js
 *   Copyright (c) 2016 Andrew Courtice
-*   
+*
 *   Version 0.1.4
-*   
+*
 *   Released under the MIT licence
 */
 
@@ -18,7 +18,7 @@
 
             /**
              * An 'enumeration' of registration types
-             * 
+             *
              * @type {Object}
              */
             REGISTRATION_TYPE = {
@@ -34,7 +34,7 @@
 
         /**
          * A 'class' for storing information about a registration
-         * 
+         *
          * @param {String} name
          * @param {REGISTRATION_TYPE} type
          * @param {Object} value
@@ -50,6 +50,10 @@
         // Register for maintaining injectables
         var register = (function() {
 
+            /**
+             * [registrations description]
+             * @type {Array}
+             */
             var registrations = [];
 
             /**
@@ -82,7 +86,7 @@
 
             /**
              * Add a new registration to the register
-             * 
+             *
              * @param {String} name The name of the registration
              * @param {REGISTRATION_TYPE} type The type of the registration
              * @param {Object} value The value of the registration
@@ -106,7 +110,8 @@
 
             /**
              * Retrieve a registration
-             * 
+             *
+             * @private
              * @param  {String} name The name of the registration
              * @return {Registration}
              */
@@ -129,9 +134,9 @@
 
             /**
              * Retrieve a set of registrations
-             * 
+             *
              * @param  {Array} names An array of names to get registrations for
-             * @return {Array} 
+             * @return {Array}
              */
             function retrieveRegistrations (names) {
 
@@ -140,14 +145,17 @@
                     throw new Error("Must provide at least one name");
                 }
 
+                // Resolve the registrations for the list of names provided
                 var resolutions = [];
                 for (var i = 0; i < names.length; i++) {
                     var resolution = getRegistration(names[i]);
                     resolutions.push(resolution);
                 }
+
                 return resolutions;
             }
 
+            // Expose public methods
             return {
                 add: addRegistration,
                 retrieve: retrieveRegistrations
@@ -155,39 +163,73 @@
 
         })();
 
+        /**
+         * Class for performing object manipulation
+         *
+         * @param  {Object}
+         * @return {Object}
+         */
         var objectModifier = (function() {
 
+            /**
+             * A helper method to clone objects
+             *
+             * @private
+             * @param  {Object} obj The object to be cloned
+             * @param  {Boolean} deepClone A boolean to indicate whether the method should recurse through the object tree
+             * @return {Object}
+             */
             function cloneObject (obj, deepClone) {
 
+                // Make sure we're working with an object
                 if (typeof obj !== "object") {
-                    throw new Error("Not an object");
+                    throw new Error("Value provided is not an object");
                 }
 
+                // Define a base target object
                 var clonedObj = {};
+
+                // Add cloned properties to the target object and recurse if necessary
                 for (var prop in obj) {
                     if (obj.hasOwnProperty(prop)) {
                         clonedObj[prop] = deepClone ? clone(obj[prop], deepClone) : obj[prop];
                     }
                 }
+
                 return clonedObj;
             }
 
+            /**
+             * A helper method to clone an array
+             *
+             * @private
+             * @param  {Array} arr The array to be cloned
+             * @param  {Boolean} A boolean to indicate whether the method should recurse through the object tree
+             * @return {Array}
+             */
             function cloneArray(arr, deepClone) {
 
+                // Make sure we're working with an array
                 if (!isArray(arr)) {
-                    throw new Error("Not an array");
+                    throw new Error("Value provided is not an array");
                 }
 
-                var clonedArr = [];
-                for (var i = 0; i < arr.length; i++) {
-                    clonedArr[i] = deepClone ? clone(arr[i], deepClone) : arr[i];
-                }
+                // Map the array to a new array and recurse if necessary
+                var clonedArr = arr.map(function (item) {
+                    return clone(item, deepClone);
+                });
+
                 return clonedArr;
             }
 
+            /**
+             * A method for cloning objects
+             *
+             * @param  {Object} obj The object to be cloned
+             * @param  {Boolean} deepClone A boolean to indicate whether the method should recurse through the object tree
+             * @return {Object}
+             */
             function clone (obj, deepClone) {
-
-                if (typeof obj === "undefined") return obj;
 
                 deepClone = deepClone || false;
 
@@ -207,53 +249,109 @@
                 return clonedObj;
             }
 
+            // Expose public methods
             return {
                 clone: clone
             };
 
         })();
 
+        /**
+         * An internal method for invoking registered values if necessary (ie. modules)
+         *
+         * @private
+         * @param  {Registration} registration The registration storing the value to be invoked
+         * @return {Object}
+         */
         function invokeRegistration (registration) {
+            var value = registration.value;
 
+            /*
+            If the registration is a module, call the getInstance method to get an instance
+            of the module from its assigned factory
+             */
             if (registration.type === REGISTRATION_TYPE.module) {
-                return registration.value.getInstance();
+                return value.getInstance();
             }
 
-            return registration.value;
+            // Otherwise just return the value of the registration
+            return value;
         }
 
+        /**
+         * A class for storing module properties and generating module instances
+         *
+         * @param {String} factoryName The name of the factory to be used to get an instance of this module
+         * @param {Function} moduleConstructor The constructor method of the module
+         * @param {Array} dependencies An array of registered dependencies required for this module
+         * @param {Object} scope The execution context of the module
+         */
         var Module = function (factoryName, moduleConstructor, dependencies, scope) {
 
+            /**
+             * A method to resolve the list of dependencies for this module
+             *
+             * @private
+             * @return {Array}
+             */
             function resolveDependencies() {
-                var resolutions = [];
-                if (typeof dependencies !== "undefined" && isArray(dependencies)) {
-                    var registrations = register.retrieve(dependencies);
-                    for (var i = 0; i < registrations.length; i++) {
-                        var registration = registrations[i];
-                        resolutions.push(invokeRegistration(registration));
-                    }
+
+                // If there are no dependencies return an empty array
+                if (typeof dependencies === "undefined") return [];
+
+                // If the dependencies aren't an array throw an error
+                if (!isArray(dependencies)) {
+                    throw new Error("Dependencies must be an array");
                 }
+
+                // Map the dependencies
+                var resolutions = dependencies.map(function (item) {
+                    return invokeRegistration(item);
+                });
+
                 return resolutions;
             }
 
+            /**
+             * Internal method to get the factory for this module
+             *
+             * @private
+             * @return {Object}
+             */
             function getFactory() {
-                if (factories.hasOwnProperty(factoryName)) {
 
+                // If the factory is registered then return it
+                if (factories.hasOwnProperty(factoryName)) {
                     return factories[factoryName];
                 }
+
+                // If not, throw an error and stop control flow
+                throw new Error("Factory " + factoryName + " is not registered");
             }
 
+            /**
+             * Method to get an instance of the current module using its assigned factory
+             *
+             * @return {Object}
+             */
             function getInstance () {
 
+                // Get the factory for this module
                 var factory = getFactory();
 
+                // Make sure the factory has a getInstance method
                 if (typeof factory.getInstance === "undefined") {
                     throw new Error("Factory must contain a 'getInstance' method");
                 }
+
+                // Resolve any dependencies for this module
                 var args = resolveDependencies();
+
+                // Call the getInstance method on the factory
                 return factory.getInstance(moduleConstructor, args, scope);
             }
 
+            // Expose public methods
             return {
                 getInstance: getInstance
             };
