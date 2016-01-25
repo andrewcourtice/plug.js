@@ -28,16 +28,16 @@ To use Plug.js it's as simple as registering modules and variables. By default P
 
 ### Usage
 
-`plug.singleton(moduleName, [ injectionSignature ], scope)`
+`plug.singleton("moduleName", [ injectionSignature ], scope)`
 
 | Argument | Type | Example | Required |
 | -------- | ---- | ------- | -------: |
 | moduleName | String | `"resourceModule"` | true |
-| injectionSignature | Array | `[ function () { ... } ] **or** [ "childModule", function(childModule) { ... } ]` | true |
+| injectionSignature | Array | `[ function () { ... } ]` **or** `[ "childModule", function(childModule) { ... } ]` | true |
 | scope | Object | `this` | false |
 
-#### Singleton
 
+#### Singleton
 ```javascript
 plug.singleton("singletonModule", [ function() {
 
@@ -67,8 +67,63 @@ plug.transient("transientModule", [ function() {
 } ]);
 ```
 
+### Variables
+
+Plug.js allows you to inject variables into the module scope. There are two types of injection available for variables: inject by **value**, and inject by **reference**.
+
+Injecting a variable by value will inform Plug.js to create a clone of the object before it is injected into a module (*only applicable to reference types eg. Object, Array, Function*).
+
+Injecting a variable by reference will inform Plug.js to treat the object normally and inject the reference to the variable into the module (*JavaScript's default behaviour for reference types*).
+
+**Note**: A locally scoped reference to the `window` and the `document` objects are injected into modules by default. You can use these locally scoped variables by simply declaring them as a dependency to your module.
+
+`plug.value("variableName", value, deepClone)`
+
+#### Inject by Value
+```javascript
+
+(function() {
+
+    /* Simple value types */
+    var foo = "Hello World",
+        bar = 7;
+
+    /* Complex reference type */
+    var complexType = {
+        foo: [
+            { a: new Date(), b: "test 1" },
+            { a: new Date(), b: "test 2" },
+            { a: new Date(), c: "test 3" }
+        ],
+        bar: {
+            a: function() {
+                alert("foo bar");
+            },
+            b: {
+                a: function() {
+                    alert("another foo bar");
+                }
+            }
+        }    
+    };
+
+    /* Inject the values */
+    plug.value("foo", foo);
+    plug.value("bar", bar);
+
+    /* alternatively, use method chaining: plug.value(...).value(...).reference(...); */
+
+    /* Deep clone */
+    plug.value("complexType", complexType, true);
+})();
+
+```
+
+
 ## Dependencies
-When registering a module you can define any other modules or registered varibles that should be injected into your module.
+When registering a module you can define any other modules or registered variables that should be injected into your module.
+
+**Note**: *Dependencies must be registered* **before** *being referenced in another module.*
 
 ```javascript
 plug.singleton("module1", [ function() {
@@ -100,18 +155,48 @@ module2.saySomethingOnOtherModule("Hello World!");
 ```
 
 ## Factories
-Plug.js' factories allow you to customize how your modules get resolved. By default Plug.js provides two factories: singleton and transient. Your custom factory must expose a method called **getInstance**. The **getInstance** method takes three arguments: moduleConstructor, args and scope. The moduleConstructor argument is the contructor function of the module which must be invoked and returned in the **getInstance** method. The args argument is an array of dependencies that have been resolved.
+A Plug.js factory allow you to customize how your modules get resolved. As outlined above Plug.js provides two factories: singleton and transient. Your custom factory must expose a method called **getInstance**. The **getInstance** method takes three arguments: *moduleConstructor*, *args* and *scope*. See below on how the arguments are used to manage module lifecycle.
+
+`plug.factory("factoryName", factoryConstructor)`
+
+| Argument | Type | Example | Required |
+| -------- | ---- | ------- | -------: |
+| factoryName | String | `"customResolver"` | true |
+| factoryConstructor | Function | `function () { ... }` | true |
+
+
+`function getInstance(moduleConstructor, args, scope) { ... }`
+
+| Argument | Type | Required |
+| -------- | ---- | -------: |
+| moduleConstructor | Function | true |
+| args | Array | true |
+| scope | Object | true |
+
 
 ```javascript
 plug.factory("customResolver", function() {
 
-    function getInstance(moduleConstructor, args, scope) {
-        return moduleConstructor.apply(scope, args);
+    /* The following is an excerpt from the Plug.js singleton factory source code */
+
+    /* A variable to store an instance of the module */
+    var instance;
+
+     /* Implement the required getInstance method */
+    function getInstance (moduleConstructor, args, scope) {
+
+        if (!instance) {
+            instance = moduleConstructor.apply(scope, args);
+        }
+
+        return instance;
     }
 
+    /* Expose public methods */
     return {
         getInstance: getInstance
-    }
+    };
+
 });
 
 plug.customResolver("module1", [ function() {
