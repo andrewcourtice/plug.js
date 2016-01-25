@@ -12,7 +12,7 @@
   <body>
     <section class="page-header">
       <h1 class="project-name">Plug.js</h1>
-      <h2 class="project-tagline">Plug JS is a small JavaScript dependency injection and object life-cycle management library</h2>
+      <h2 class="project-tagline">Plug JS is a lightweight JavaScript dependency injection and object life-cycle management library</h2>
       <a href="https://github.com/andrewcourtice/plug.js" class="btn">View on GitHub</a>
       <a href="https://github.com/andrewcourtice/plug.js/zipball/master" class="btn">Download .zip</a>
       <a href="https://github.com/andrewcourtice/plug.js/tarball/master" class="btn">Download .tar.gz</a>
@@ -22,12 +22,71 @@
       <h1>
 <a id="plugjs" class="anchor" href="#plugjs" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Plug.js</h1>
 
-<p>Plug JS is a lightweight JavaScript dependency injection and object life-cycle management library. The purpose of Plug.js is to provide a flexible way to wire up modules. With no dependencies on third-party libraries, Plug.js weighs in at just 3kb (minified). Plug.js's dependency registration uses a familiar AngularJS style signature.</p>
+<p>Plug.js is a lightweight JavaScript dependency injection and object life-cycle management library. The purpose of Plug.js is to provide a flexible way to connect modules and share data between them without requiring a hard dependency on a framework or a steep learning curve.</p>
+
+<p>With no dependencies on third-party libraries, Plug.js weighs in at just 3kb (minified).</p>
+
+<p>Plug.js' dependency registration uses a familiar RequireJS/AngularJS style signature making it quick and easy for developers with all different levels of experience to get up and running.</p>
 
 <h2>
-<a id="getting-started" class="anchor" href="#getting-started" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Getting Started</h2>
+<a id="the-facts" class="anchor" href="#the-facts" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>The Facts</h2>
 
-<p>To use Plug.js it's as simple as registering modules as either singleton or transient. A singleton registration will enforce a single instance of the registered module when resolved, while a transient registration will call the module's constructor each time the module is resolved.</p>
+<ul>
+<li>Plug.js <strong>is not</strong> a module loader (<em>RequireJS</em>)</li>
+<li>Plug.js <strong>is</strong> a dependency injector</li>
+<li>Plug.js <strong>is not</strong> a full framework (<em>AngularJS</em>)</li>
+<li>Plug.js <strong>is</strong> an object lifecycle manager</li>
+</ul>
+
+<h2>
+<a id="why-use-plugjs" class="anchor" href="#why-use-plugjs" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Why use Plug.js?</h2>
+
+<p>Plug.js is designed to encourage less dependencies on frameworks that are often packed with more features than required for most project situations. It's also designed to be simple for even the most novice developer. Finally, Plug.js is designed to be flexible - to fit around your project, not make your project fit around it. This decoupling allows developers to easily upgrade and/or swap technologies without redesigning the entire front-end architecture.  </p>
+
+<h2>
+<a id="get-plugging" class="anchor" href="#get-plugging" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Get Plugging</h2>
+
+<p>First, download the Plug.js file or Plug.min.js (<em>recommended</em>) file and include it in your page either in the <code>&lt;head&gt;</code> section or just before the closing tag of the <code>&lt;body&gt;</code> section.</p>
+
+<p>To use Plug.js it's as simple as registering modules and variables. By default Plug.js provides two type of lifecycle factories (<em>explained below</em>): <strong>singleton</strong> and <strong>transient</strong>. A singleton registration will only a single instance of the registered module is ever resolved, while a transient registration will return a new instance of the module each time it is resolved.</p>
+
+<h3>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h3>
+
+<p><code>plug.singleton("moduleName", [ injectionSignature ], scope)</code></p>
+
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Example</th>
+<th align="right">Required</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>moduleName</td>
+<td>String</td>
+<td><code>"resourceModule"</code></td>
+<td align="right">true</td>
+</tr>
+<tr>
+<td>injectionSignature</td>
+<td>Array</td>
+<td>
+<code>[ function () { ... } ]</code> <strong>or</strong> <code>[ "childModule", function(childModule) { ... } ]</code>
+</td>
+<td align="right">true</td>
+</tr>
+<tr>
+<td>scope</td>
+<td>Object</td>
+<td><code>this</code></td>
+<td align="right">false</td>
+</tr>
+</tbody>
+</table>
 
 <h4>
 <a id="singleton" class="anchor" href="#singleton" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Singleton</h4>
@@ -59,12 +118,182 @@
 
 } ]);</pre></div>
 
+<h3>
+<a id="variables" class="anchor" href="#variables" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Variables</h3>
+
+<p>Plug.js allows you to inject variables into the module scope. There are two types of injection available for variables: inject by <strong>value</strong>, and inject by <strong>reference</strong>.</p>
+
+<p>Injecting a variable by value will inform Plug.js to create a clone of the object before it is injected into a module (<em>only applicable to reference types eg. Object, Array, Function</em>).</p>
+
+<p>Injecting a variable by reference will inform Plug.js to treat the object normally and inject the reference to the variable into the module (<em>JavaScript's default behaviour for reference types</em>).</p>
+
+<p><strong>Note</strong>: A locally scoped reference to the <code>window</code> and the <code>document</code> objects are injected into modules by default. You can use these locally scoped variables by simply declaring them as a dependency to your module.</p>
+
+<h4>
+<a id="inject-by-value" class="anchor" href="#inject-by-value" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Inject by Value</h4>
+
+<p><code>plug.value("variableName", value, deepClone)</code></p>
+
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Example</th>
+<th align="right">Required</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>variableName</td>
+<td>String</td>
+<td><code>"customResolver"</code></td>
+<td align="right">true</td>
+</tr>
+<tr>
+<td>value</td>
+<td>Object</td>
+<td>{}</td>
+<td align="right">true</td>
+</tr>
+<tr>
+<td>deepClone</td>
+<td>Boolean</td>
+<td>true</td>
+<td align="right">false</td>
+</tr>
+</tbody>
+</table>
+
+<div class="highlight highlight-source-js"><pre>
+(<span class="pl-k">function</span>() {
+
+    <span class="pl-c">/* Simple value types */</span>
+    <span class="pl-k">var</span> foo <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Hello World<span class="pl-pds">"</span></span>,
+        bar <span class="pl-k">=</span> <span class="pl-c1">7</span>;
+
+    <span class="pl-c">/* Complex reference type */</span>
+    <span class="pl-k">var</span> complexType <span class="pl-k">=</span> {
+        foo<span class="pl-k">:</span> [
+            { a<span class="pl-k">:</span> <span class="pl-k">new</span> <span class="pl-en">Date</span>(), b<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>test 1<span class="pl-pds">"</span></span> },
+            { a<span class="pl-k">:</span> <span class="pl-k">new</span> <span class="pl-en">Date</span>(), b<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>test 2<span class="pl-pds">"</span></span> },
+            { a<span class="pl-k">:</span> <span class="pl-k">new</span> <span class="pl-en">Date</span>(), c<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>test 3<span class="pl-pds">"</span></span> }
+        ],
+        bar<span class="pl-k">:</span> {
+            <span class="pl-en">a</span><span class="pl-k">:</span> <span class="pl-k">function</span>() {
+                <span class="pl-c1">alert</span>(<span class="pl-s"><span class="pl-pds">"</span>foo bar<span class="pl-pds">"</span></span>);
+            },
+            b<span class="pl-k">:</span> {
+                <span class="pl-en">a</span><span class="pl-k">:</span> <span class="pl-k">function</span>() {
+                    <span class="pl-c1">alert</span>(<span class="pl-s"><span class="pl-pds">"</span>another foo bar<span class="pl-pds">"</span></span>);
+                }
+            }
+        }    
+    };
+
+    <span class="pl-c">/* Inject the values */</span>
+    <span class="pl-smi">plug</span>.<span class="pl-c1">value</span>(<span class="pl-s"><span class="pl-pds">"</span>foo<span class="pl-pds">"</span></span>, foo);
+    <span class="pl-smi">plug</span>.<span class="pl-c1">value</span>(<span class="pl-s"><span class="pl-pds">"</span>bar<span class="pl-pds">"</span></span>, bar);
+
+    <span class="pl-c">/* alternatively, use method chaining: plug.value(...).value(...).reference(...); */</span>
+
+    <span class="pl-c">/* Deep clone */</span>
+    <span class="pl-smi">plug</span>.<span class="pl-c1">value</span>(<span class="pl-s"><span class="pl-pds">"</span>complexType<span class="pl-pds">"</span></span>, complexType, <span class="pl-c1">true</span>);
+    <span class="pl-c">/* When complexType is resolved it will be a new instance in each resolution. In other words complexType1.foo !== complexType2.foo */</span>
+    <span class="pl-c">/* Modifying values on complexType1 has no effect on complexType2 */</span>
+})();
+</pre></div>
+
+<h4>
+<a id="inject-by-reference" class="anchor" href="#inject-by-reference" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Inject by Reference</h4>
+
+<p><code>plug.reference("variableName", value, deepClone)</code></p>
+
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Example</th>
+<th align="right">Required</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>variableName</td>
+<td>String</td>
+<td><code>"customResolver"</code></td>
+<td align="right">true</td>
+</tr>
+<tr>
+<td>value</td>
+<td>Object</td>
+<td>{}</td>
+<td align="right">true</td>
+</tr>
+</tbody>
+</table>
+
+<div class="highlight highlight-source-js"><pre>
+(<span class="pl-k">function</span>() {
+
+    <span class="pl-c">/* Simple value types */</span>
+    <span class="pl-k">var</span> foo <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>Hello World<span class="pl-pds">"</span></span>,
+        bar <span class="pl-k">=</span> <span class="pl-c1">7</span>;
+
+    <span class="pl-c">/* Complex reference type */</span>
+    <span class="pl-k">var</span> complexType <span class="pl-k">=</span> {
+        foo<span class="pl-k">:</span> [
+            { a<span class="pl-k">:</span> <span class="pl-k">new</span> <span class="pl-en">Date</span>(), b<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>test 1<span class="pl-pds">"</span></span> },
+            { a<span class="pl-k">:</span> <span class="pl-k">new</span> <span class="pl-en">Date</span>(), b<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>test 2<span class="pl-pds">"</span></span> },
+            { a<span class="pl-k">:</span> <span class="pl-k">new</span> <span class="pl-en">Date</span>(), c<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>test 3<span class="pl-pds">"</span></span> }
+        ],
+        bar<span class="pl-k">:</span> {
+            <span class="pl-en">a</span><span class="pl-k">:</span> <span class="pl-k">function</span>() {
+                <span class="pl-c1">alert</span>(<span class="pl-s"><span class="pl-pds">"</span>foo bar<span class="pl-pds">"</span></span>);
+            },
+            b<span class="pl-k">:</span> {
+                <span class="pl-en">a</span><span class="pl-k">:</span> <span class="pl-k">function</span>() {
+                    <span class="pl-c1">alert</span>(<span class="pl-s"><span class="pl-pds">"</span>another foo bar<span class="pl-pds">"</span></span>);
+                }
+            }
+        }    
+    };
+
+    <span class="pl-c">/* Inject the values */</span>
+    <span class="pl-smi">plug</span>.<span class="pl-en">reference</span>(<span class="pl-s"><span class="pl-pds">"</span>foo<span class="pl-pds">"</span></span>, foo);
+    <span class="pl-smi">plug</span>.<span class="pl-en">reference</span>(<span class="pl-s"><span class="pl-pds">"</span>bar<span class="pl-pds">"</span></span>, bar);
+
+    <span class="pl-c">/* alternatively, use method chaining: plug.value(...).value(...).reference(...); */</span>
+
+    <span class="pl-c">/* Deep clone */</span>
+    <span class="pl-smi">plug</span>.<span class="pl-en">reference</span>(<span class="pl-s"><span class="pl-pds">"</span>complexType<span class="pl-pds">"</span></span>, complexType, <span class="pl-c1">true</span>);
+    <span class="pl-c">/* When complexType is resolved it will be the same instance in each resolution. In other words complexType1.foo === complexType2.foo */</span>
+    <span class="pl-c">/* Modifying values on complexType1 changes values on complexType2 because they are the same object */</span>
+})();
+</pre></div>
+
+<h2>
+<a id="resolving-registrations" class="anchor" href="#resolving-registrations" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Resolving Registrations</h2>
+
+<p>Plug.js uses a single method to resolve registered objects outside the context of a module constructor.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> fooBar <span class="pl-k">=</span> <span class="pl-smi">plug</span>.<span class="pl-en">resolve</span>(<span class="pl-s"><span class="pl-pds">"</span>moduleOrVariableName<span class="pl-pds">"</span></span>)</pre></div>
+
+<p>or</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> fooBar <span class="pl-k">=</span> <span class="pl-smi">plug</span>.<span class="pl-en">resolve</span>([ <span class="pl-s"><span class="pl-pds">"</span>module1<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>module2<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>value1<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>module3<span class="pl-pds">"</span></span> ])</pre></div>
+
+<p>Using the array method will return an object with each resolution as a property of the object, whereas the default string method will return the single resolution.</p>
+
 <h2>
 <a id="dependencies" class="anchor" href="#dependencies" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Dependencies</h2>
 
-<p>When registering a module you can define any other modules or registered varibles that should be injected into your module.</p>
+<p>When registering a module you can define any other modules or registered variables that should be injected into your module.</p>
 
-<div class="highlight highlight-source-js"><pre><span class="pl-smi">plug</span>.<span class="pl-en">singleton</span>(<span class="pl-s"><span class="pl-pds">"</span>module1<span class="pl-pds">"</span></span>, [ <span class="pl-k">function</span>() { 
+<p><strong>Note</strong>: <em>Dependencies must be registered</em> <strong>before</strong> <em>being referenced in another module.</em></p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-smi">plug</span>.<span class="pl-en">singleton</span>(<span class="pl-s"><span class="pl-pds">"</span>module1<span class="pl-pds">"</span></span>, [ <span class="pl-k">function</span>() {
 
     <span class="pl-k">function</span> <span class="pl-en">saySomething</span>(<span class="pl-smi">message</span>) {
         <span class="pl-c1">alert</span>(message);
@@ -94,21 +323,90 @@
 <h2>
 <a id="factories" class="anchor" href="#factories" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Factories</h2>
 
-<p>Plug.js' factories allow you to customize how your modules get resolved. By default Plug.js provides two factories: singleton and transient. Your custom factory must expose a method called <strong>getInstance</strong>. The <strong>getInstance</strong> method takes three arguments: moduleConstructor, args and scope. The moduleConstructor argument is the contructor function of the module which must be invoked and returned in the <strong>getInstance</strong> method. The args argument is an array of dependencies that have been resolved. </p>
+<p>A Plug.js factory allow you to customize how your modules get resolved. As outlined above Plug.js provides two factories: singleton and transient. Your custom factory must expose a method called <strong>getInstance</strong>. The <strong>getInstance</strong> method takes three arguments: <em>moduleConstructor</em>, <em>args</em> and <em>scope</em>. See below on how the arguments are used to manage module lifecycle.</p>
+
+<p><code>plug.factory("factoryName", factoryConstructor)</code></p>
+
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Example</th>
+<th align="right">Required</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>factoryName</td>
+<td>String</td>
+<td><code>"customResolver"</code></td>
+<td align="right">true</td>
+</tr>
+<tr>
+<td>factoryConstructor</td>
+<td>Function</td>
+<td><code>function () { ... }</code></td>
+<td align="right">true</td>
+</tr>
+</tbody>
+</table>
+
+<p><code>function getInstance(moduleConstructor, args, scope) { ... }</code></p>
+
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th align="right">Required</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>moduleConstructor</td>
+<td>Function</td>
+<td align="right">true</td>
+</tr>
+<tr>
+<td>args</td>
+<td>Array</td>
+<td align="right">true</td>
+</tr>
+<tr>
+<td>scope</td>
+<td>Object</td>
+<td align="right">true</td>
+</tr>
+</tbody>
+</table>
 
 <div class="highlight highlight-source-js"><pre><span class="pl-smi">plug</span>.<span class="pl-en">factory</span>(<span class="pl-s"><span class="pl-pds">"</span>customResolver<span class="pl-pds">"</span></span>, <span class="pl-k">function</span>() {
 
-    <span class="pl-k">function</span> <span class="pl-en">getInstance</span>(<span class="pl-smi">moduleConstructor</span>, <span class="pl-smi">args</span>, <span class="pl-smi">scope</span>) {
-        <span class="pl-k">return</span> <span class="pl-smi">moduleConstructor</span>.<span class="pl-c1">apply</span>(scope, args);
+    <span class="pl-c">/* The following is an excerpt from the Plug.js singleton factory source code */</span>
+
+    <span class="pl-c">/* A variable to store an instance of the module */</span>
+    <span class="pl-k">var</span> instance;
+
+     <span class="pl-c">/* Implement the required getInstance method */</span>
+    <span class="pl-k">function</span> <span class="pl-en">getInstance</span> (<span class="pl-smi">moduleConstructor</span>, <span class="pl-smi">args</span>, <span class="pl-smi">scope</span>) {
+
+        <span class="pl-k">if</span> (<span class="pl-k">!</span>instance) {
+            instance <span class="pl-k">=</span> <span class="pl-smi">moduleConstructor</span>.<span class="pl-c1">apply</span>(scope, args);
+        }
+
+        <span class="pl-k">return</span> instance;
     }
 
+    <span class="pl-c">/* Expose public methods */</span>
     <span class="pl-k">return</span> {
         getInstance<span class="pl-k">:</span> getInstance
-    }
+    };
+
 });
 
 <span class="pl-smi">plug</span>.<span class="pl-en">customResolver</span>(<span class="pl-s"><span class="pl-pds">"</span>module1<span class="pl-pds">"</span></span>, [ <span class="pl-k">function</span>() {
-    <span class="pl-c">// Module code ...</span>
+    <span class="pl-c">/* ... */</span>
 } ]);</pre></div>
 
       <footer class="site-footer">
