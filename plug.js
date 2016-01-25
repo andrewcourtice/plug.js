@@ -1,20 +1,10 @@
 /*
-MIT Licence
-Copyright (c) 2016 Andrew Courtice
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to
-do so, subject to the following conditions:
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*   Plug.Js
+*   Copyright (c) 2016 Andrew Courtice
+*   
+*   Version 0.1.4
+*   
+*   Released under the MIT licence
 */
 
 ;(function (window, document, undefined) {
@@ -48,12 +38,22 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
 
             var registrations = [];
 
+            /**
+             * Checks to see if an object with the given name has been registered
+             * @param  {String} name
+             * @return {Boolean}
+             */
             function isRegistered (name) {
                 for (var i = 0; i < registrations.length; i++) {
                     return registrations[i].name === name;
                 }
             }
 
+            /**
+             * Update the value of an exisiting registration
+             * @param  {String} name
+             * @param  {Object} value
+             */
             function updateRegistration (name, value) {
                 for (var i = 0; i < registrations.length; i++) {
                     var registration = registrations[i];
@@ -62,32 +62,55 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
                 }
             }
 
+            /**
+             * Add a new registration to the register
+             * @param {String} name
+             * @param {REGISTRATION_TYPE} type
+             * @param {Object} value
+             */
             function addRegistration (name, type, value) {
+
+                // Check minimum requirements for a registration
                 if (typeof name === "undefined" || typeof type === "undefined") {
                     throw new Error("Invalid registration");
                 }
 
+                // If it's already registered, update the value of the registration
                 if (isRegistered(name)) {
                     updateRegistration(name, value);
+                    return;
                 }
 
+                // Add it to the list of registrations
                 registrations.push(new Registration(name, type, value));
             }
 
+            /**
+             * Get a registration
+             * @param  {String} name
+             * @return {Registration}
+             */
             function getRegistration (name) {
 
+                // Make sure the name is valid
                 if (!name || typeof name !== "string") {
-                    console.warn("Invalid name provided");
-                    return undefined;
+                    throw new Error("Invalid name provided");
                 }
 
+                // Find the registration
                 for (var i = 0; i < registrations.length; i++) {
                     var registration = registrations[i];
                     if (registration.name === name) return registration;
                 }
+
+                // At this point the name failed to be resolved. Warn the user.
                 console.warn("Failed to resolve " + name + ". Expect undefined for mapped variable.");
             }
 
+            /**
+             * @param  {Array} names
+             * @return {Array}
+             */
             function retrieveRegistrations (names) {
 
                 if (typeof names === "undefined" || !isArray(names)) {
