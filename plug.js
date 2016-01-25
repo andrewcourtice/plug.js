@@ -392,7 +392,7 @@
             }
 
             /* Default the scope to the current instance */
-            scope = scope || self;
+            scope = scope || this;
 
             /* Create a new module object */
             var module = new Module(factoryName, moduleConstructor, constructorArray, scope);
