@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Plug.js by andrewcourtice</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Plug.js</h1>
+      <h2 class="project-tagline">Plug JS is a small JavaScript dependency injection and object life-cycle management library</h2>
+      <a href="https://github.com/andrewcourtice/plug.js" class="btn">View on GitHub</a>
+      <a href="https://github.com/andrewcourtice/plug.js/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/andrewcourtice/plug.js/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="plugjs" class="anchor" href="#plugjs" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Plug.js</h1>
+
+<p>Plug JS is a lightweight JavaScript dependency injection and object life-cycle management library. The purpose of Plug.js is to provide a flexible way to wire up modules. With no dependencies on third-party libraries, Plug.js weighs in at just 3kb (minified). Plug.js's dependency registration uses a familiar AngularJS style signature.</p>
+
+<h2>
+<a id="getting-started" class="anchor" href="#getting-started" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Getting Started</h2>
+
+<p>To use Plug.js it's as simple as registering modules as either singleton or transient. A singleton registration will enforce a single instance of the registered module when resolved, while a transient registration will call the module's constructor each time the module is resolved.</p>
+
+<h4>
+<a id="singleton" class="anchor" href="#singleton" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Singleton</h4>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-smi">plug</span>.<span class="pl-en">singleton</span>(<span class="pl-s"><span class="pl-pds">"</span>singletonModule<span class="pl-pds">"</span></span>, [ <span class="pl-k">function</span>() {
+
+    <span class="pl-k">function</span> <span class="pl-en">doSomething</span>() {
+        <span class="pl-c1">alert</span>(<span class="pl-s"><span class="pl-pds">"</span>Did Something!<span class="pl-pds">"</span></span>);
+    }
+
+    <span class="pl-k">return</span> {
+        doSomething<span class="pl-k">:</span> doSomething
+    };
+
+} ]);</pre></div>
+
+<h4>
+<a id="transient" class="anchor" href="#transient" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Transient</h4>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-smi">plug</span>.<span class="pl-en">transient</span>(<span class="pl-s"><span class="pl-pds">"</span>transientModule<span class="pl-pds">"</span></span>, [ <span class="pl-k">function</span>() {
+
+    <span class="pl-k">function</span> <span class="pl-en">doSomething</span>() {
+        <span class="pl-c1">alert</span>(<span class="pl-s"><span class="pl-pds">"</span>Did Something!<span class="pl-pds">"</span></span>);
+    }
+
+    <span class="pl-k">return</span> {
+        doSomething<span class="pl-k">:</span> doSomething
+    };
+
+} ]);</pre></div>
+
+<h2>
+<a id="dependencies" class="anchor" href="#dependencies" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Dependencies</h2>
+
+<p>When registering a module you can define any other modules or registered varibles that should be injected into your module.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-smi">plug</span>.<span class="pl-en">singleton</span>(<span class="pl-s"><span class="pl-pds">"</span>module1<span class="pl-pds">"</span></span>, [ <span class="pl-k">function</span>() { 
+
+    <span class="pl-k">function</span> <span class="pl-en">saySomething</span>(<span class="pl-smi">message</span>) {
+        <span class="pl-c1">alert</span>(message);
+    }
+
+    <span class="pl-k">return</span> {
+        saySomething<span class="pl-k">:</span> saySomething
+    };
+
+} ]);
+
+<span class="pl-smi">plug</span>.<span class="pl-en">singleton</span>(<span class="pl-s"><span class="pl-pds">"</span>module2<span class="pl-pds">"</span></span>, [ <span class="pl-s"><span class="pl-pds">"</span>module1<span class="pl-pds">"</span></span>, <span class="pl-k">function</span>(<span class="pl-smi">module1</span>) {
+
+    <span class="pl-k">function</span> <span class="pl-en">saySomethingOnOtherModule</span>(<span class="pl-smi">message</span>) {
+        <span class="pl-smi">module1</span>.<span class="pl-en">saySomething</span>(message);
+    }
+
+    <span class="pl-k">return</span> {
+        saySomethingOnOtherModule<span class="pl-k">:</span> saySomethingOnOtherModule
+    };
+
+} ]);
+
+<span class="pl-k">var</span> module2 <span class="pl-k">=</span> <span class="pl-smi">plug</span>.<span class="pl-en">resolve</span>(<span class="pl-s"><span class="pl-pds">"</span>module2<span class="pl-pds">"</span></span>);
+<span class="pl-smi">module2</span>.<span class="pl-en">saySomethingOnOtherModule</span>(<span class="pl-s"><span class="pl-pds">"</span>Hello World!<span class="pl-pds">"</span></span>);</pre></div>
+
+<h2>
+<a id="factories" class="anchor" href="#factories" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Factories</h2>
+
+<p>Plug.js' factories allow you to customize how your modules get resolved. By default Plug.js provides two factories: singleton and transient. Your custom factory must expose a method called <strong>getInstance</strong>. The <strong>getInstance</strong> method takes three arguments: moduleConstructor, args and scope. The moduleConstructor argument is the contructor function of the module which must be invoked and returned in the <strong>getInstance</strong> method. The args argument is an array of dependencies that have been resolved. </p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-smi">plug</span>.<span class="pl-en">factory</span>(<span class="pl-s"><span class="pl-pds">"</span>customResolver<span class="pl-pds">"</span></span>, <span class="pl-k">function</span>() {
+
+    <span class="pl-k">function</span> <span class="pl-en">getInstance</span>(<span class="pl-smi">moduleConstructor</span>, <span class="pl-smi">args</span>, <span class="pl-smi">scope</span>) {
+        <span class="pl-k">return</span> <span class="pl-smi">moduleConstructor</span>.<span class="pl-c1">apply</span>(scope, args);
+    }
+
+    <span class="pl-k">return</span> {
+        getInstance<span class="pl-k">:</span> getInstance
+    }
+});
+
+<span class="pl-smi">plug</span>.<span class="pl-en">customResolver</span>(<span class="pl-s"><span class="pl-pds">"</span>module1<span class="pl-pds">"</span></span>, [ <span class="pl-k">function</span>() {
+    <span class="pl-c">// Module code ...</span>
+} ]);</pre></div>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/andrewcourtice/plug.js">Plug.js</a> is maintained by <a href="https://github.com/andrewcourtice">andrewcourtice</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
