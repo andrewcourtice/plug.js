@@ -223,6 +223,22 @@
             }
 
             /**
+             * A helper method to clone a function
+             *
+             * @param  {Function} func The function to be cloned
+             * @return {Function}
+             */
+            function cloneFunction(func) {
+
+                /* Make sure we're working with a function */
+                if (typeof func !== "function") {
+                    throw new Error("Value provided is not a function");
+                }
+
+                return func.bind({});
+            }
+
+            /**
              * A method for cloning objects
              *
              * @param  {Object} obj The object to be cloned
@@ -237,11 +253,17 @@
                 /* Test the object type and clone accordingly */
                 var clonedObj = obj;
                 switch (true) {
+                    case (obj instanceof Element && typeof obj === "object" && obj.nodeName):
+                        clonedObj = obj.cloneNode(deepClone);
+                        break;
                     case (obj instanceof Object || typeof obj === "object"):
                         clonedObj = cloneObject(obj, deepClone)
                         break;
                     case (obj instanceof Array || isArray(obj)):
                         clonedObj = cloneArray(obj, deepClone);
+                        break;
+                    case (obj instanceof Function || typeof obj === "function"):
+                        clonedObj = cloneFunction(obj);
                         break;
                     case (obj instanceof Date):
                         clonedObj = new Date();
