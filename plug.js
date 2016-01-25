@@ -16,15 +16,29 @@
         var self = this,
             isArray = Array.isArray,
 
-            // Enumeration for storing registration types
+            /**
+             * An 'enumeration' of registration types
+             * 
+             * @type {Object}
+             */
             REGISTRATION_TYPE = {
                 module: 1,
                 injectable: 2
             },
 
+            /**
+             * An object to store references to registered factories
+             * @type {Object}
+             */
             factories = {};
 
-        // Registration object for storing registered injectables
+        /**
+         * A 'class' for storing information about a registration
+         * 
+         * @param {String} name
+         * @param {REGISTRATION_TYPE} type
+         * @param {Object} value
+         */
         var Registration = function (name, type, value) {
             return {
                 name: name,
@@ -40,6 +54,8 @@
 
             /**
              * Checks to see if an object with the given name has been registered
+             *
+             * @private
              * @param  {String} name
              * @return {Boolean}
              */
@@ -51,6 +67,8 @@
 
             /**
              * Update the value of an exisiting registration
+             *
+             * @private
              * @param  {String} name
              * @param  {Object} value
              */
@@ -64,9 +82,10 @@
 
             /**
              * Add a new registration to the register
-             * @param {String} name
-             * @param {REGISTRATION_TYPE} type
-             * @param {Object} value
+             * 
+             * @param {String} name The name of the registration
+             * @param {REGISTRATION_TYPE} type The type of the registration
+             * @param {Object} value The value of the registration
              */
             function addRegistration (name, type, value) {
 
@@ -86,8 +105,9 @@
             }
 
             /**
-             * Get a registration
-             * @param  {String} name
+             * Retrieve a registration
+             * 
+             * @param  {String} name The name of the registration
              * @return {Registration}
              */
             function getRegistration (name) {
@@ -108,11 +128,14 @@
             }
 
             /**
-             * @param  {Array} names
-             * @return {Array}
+             * Retrieve a set of registrations
+             * 
+             * @param  {Array} names An array of names to get registrations for
+             * @return {Array} 
              */
             function retrieveRegistrations (names) {
 
+                // Make sure the list of names is not undefined and is a valid array
                 if (typeof names === "undefined" || !isArray(names)) {
                     throw new Error("Must provide at least one name");
                 }
