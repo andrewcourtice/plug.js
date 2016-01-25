@@ -77,9 +77,16 @@ Injecting a variable by reference will inform Plug.js to treat the object normal
 
 **Note**: A locally scoped reference to the `window` and the `document` objects are injected into modules by default. You can use these locally scoped variables by simply declaring them as a dependency to your module.
 
+#### Inject by Value
+
 `plug.value("variableName", value, deepClone)`
 
-#### Inject by Value
+| Argument | Type | Example | Required |
+| -------- | ---- | ------- | -------: |
+| variableName | String | `"customResolver"` | true |
+| value | Object | {} | true |
+| deepClone | Boolean | true | false |
+
 ```javascript
 
 (function() {
@@ -115,6 +122,58 @@ Injecting a variable by reference will inform Plug.js to treat the object normal
 
     /* Deep clone */
     plug.value("complexType", complexType, true);
+    /* When complexType is resolved it will be a new instance in each resolution. In other words complexType1.foo !== complexType2.foo */
+    /* Modifying values on complexType1 has no effect on complexType2 */
+})();
+
+```
+
+#### Inject by Reference
+
+`plug.reference("variableName", value, deepClone)`
+
+| Argument | Type | Example | Required |
+| -------- | ---- | ------- | -------: |
+| variableName | String | `"customResolver"` | true |
+| value | Object | {} | true |
+
+```javascript
+
+(function() {
+
+    /* Simple value types */
+    var foo = "Hello World",
+        bar = 7;
+
+    /* Complex reference type */
+    var complexType = {
+        foo: [
+            { a: new Date(), b: "test 1" },
+            { a: new Date(), b: "test 2" },
+            { a: new Date(), c: "test 3" }
+        ],
+        bar: {
+            a: function() {
+                alert("foo bar");
+            },
+            b: {
+                a: function() {
+                    alert("another foo bar");
+                }
+            }
+        }    
+    };
+
+    /* Inject the values */
+    plug.reference("foo", foo);
+    plug.reference("bar", bar);
+
+    /* alternatively, use method chaining: plug.value(...).value(...).reference(...); */
+
+    /* Deep clone */
+    plug.reference("complexType", complexType, true);
+    /* When complexType is resolved it will be the same instance in each resolution. In other words complexType1.foo === complexType2.foo */
+    /* Modifying values on complexType1 changes values on complexType2 because they are the same object */
 })();
 
 ```
@@ -200,6 +259,6 @@ plug.factory("customResolver", function() {
 });
 
 plug.customResolver("module1", [ function() {
-    // Module code ...
+    /* ... */
 } ]);
 ```
