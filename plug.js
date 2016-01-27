@@ -3,7 +3,7 @@
 *   http://andrewcourtice.github.io/plug.js
 *   Copyright (c) 2016 Andrew Courtice
 *
-*   Version 0.5.8
+*   Version 0.5.9
 *
 *   Released under the MIT licence
 */
@@ -22,7 +22,7 @@
              * @type {Object}
              */
             VALIDATION_RULES = {
-                propertyName: "s/^[^a-zA-Z_]+|[^a-zA-Z_0-9]+//g"
+                propertyName: /^[^a-zA-Z$_]+|[^a-zA-Z_0-9$]+/gi
             },
 
             /**
