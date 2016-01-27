@@ -48,7 +48,7 @@
 
 <p>First, download the Plug.js file or Plug.min.js (<em>recommended</em>) file and include it in your page either in the <code>&lt;head&gt;</code> section or just before the closing tag of the <code>&lt;body&gt;</code> section.</p>
 
-<p>To use Plug.js it's as simple as registering modules and variables. By default Plug.js provides two type of lifecycle factories (<em>explained below</em>): <strong>singleton</strong> and <strong>transient</strong>. A singleton registration will only a single instance of the registered module is ever resolved, while a transient registration will return a new instance of the module each time it is resolved.</p>
+<p>To use Plug.js it's as simple as registering modules and variables. By default Plug.js provides two type of lifecycle factories (<em>explained below</em>): <strong>singleton</strong> and <strong>transient</strong>. A singleton registration will ensure only a single instance of the registered module is ever resolved, while a transient registration will return a new instance of the module each time it is resolved.</p>
 
 <h3>
 <a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h3>
@@ -417,6 +417,16 @@
 
     </section>
 
-  
+            <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-59842502-2");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
   </body>
 </html>
