@@ -1,8 +1,9 @@
 /*
 *   Plug.Js
+*   http://andrewcourtice.github.io/plug.js
 *   Copyright (c) 2016 Andrew Courtice
 *
-*   Version 0.1.5
+*   Version 0.5.8
 *
 *   Released under the MIT licence
 */
@@ -15,6 +16,14 @@
 
         var self = this,
             isArray = Array.isArray,
+
+            /**
+             * A Dictionary of regex patterns used to validate strings
+             * @type {Object}
+             */
+            VALIDATION_RULES = {
+                propertyName: "s/^[^a-zA-Z_]+|[^a-zA-Z_0-9]+//g"
+            },
 
             /**
              * An 'enumeration' of registration types
@@ -468,12 +477,15 @@
                 throw new Error("A valid factory must be supplied")
             }
 
+            /* Cleanup the property name */
+            var cleanFactoryName = factoryName.replace(VALIDATION_RULES.propertyName, "");
+
             /* Call the factory method and get it's return value */
-            factories[factoryName] = factory;
+            factories[cleanFactoryName] = factory;
 
             /* Create a new factory method on the current instance  for registering modules with this factory */
-            this[factoryName] = function(moduleName, constructorArray, scope) {
-                registerModule(moduleName, factoryName, constructorArray, scope);
+            this[cleanFactoryName] = function(moduleName, constructorArray, scope) {
+                registerModule(moduleName, cleanFactoryName, constructorArray, scope);
             }
         }
 
