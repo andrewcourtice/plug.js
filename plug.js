@@ -336,6 +336,8 @@
 
         /**
          * Checks to see if a factory is registered
+         *
+         * @private
          * @param  {String} name The name of the factory
          * @return {Boolean}
          */
@@ -345,6 +347,7 @@
 
         /**
          * Adds a factory to the factory store
+         *
          * @param {String} name The name of the factory to add to the factory store
          * @param {Function} factoryConstructor The constructor of the factory
          */
@@ -354,6 +357,7 @@
 
         /**
          * Gets a factory from the factory store
+         *
          * @param  {[type]} name The name of the factory to retrieve
          * @return {Object}
          */
@@ -577,6 +581,7 @@
 
     /**
      * Method to create a new instance of plug
+     *
      * @return {Plug}
      */
     function create () {
@@ -602,6 +607,7 @@
     /**
      * Method to initialize and expose an instance of plug
      *
+     * @private
      * @return {Undefined}
      */
     function expose() {
