@@ -164,11 +164,11 @@
                 var instance;
 
                 /* Implement the required getInstance method */
-                function getInstance (moduleConstructor, args, scope) {
+                function getInstance (moduleConstructor, args) {
 
                     /* If there is no instance stored on the factory, get one */
                     if (!instance) {
-                        instance = moduleConstructor.apply(scope, args);
+                        instance = moduleConstructor.apply(this, args);
                     }
 
                     return instance;
@@ -185,8 +185,8 @@
             transient: function () {
 
                 /* Implement the required getInstance method */
-                function getInstance (moduleConstructor, args, scope) {
-                    args.unshift(scope);
+                function getInstance (moduleConstructor, args) {
+                    args.unshift(this);
                     return new (Function.prototype.bind.apply(moduleConstructor, args));
                 }
 
