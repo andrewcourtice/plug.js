@@ -34,7 +34,6 @@ To use Plug.js it's as simple as registering modules and variables. By default P
 | -------- | ---- | ------- | -------: |
 | moduleName | String | `"resourceModule"` | true |
 | injectionSignature | Array | `[ function () { ... } ]` **or** `[ "childModule", function(childModule) { ... } ]` | true |
-| scope | Object | `this` | false |
 
 
 #### Singleton
@@ -237,13 +236,12 @@ A Plug.js factory allow you to customize how your modules get resolved. As outli
 | factoryConstructor | Function | `function () { ... }` | true |
 
 
-`function getInstance(moduleConstructor, args, scope) { ... }`
+`function getInstance(moduleConstructor, args) { ... }`
 
 | Argument | Type | Required |
 | -------- | ---- | -------: |
 | moduleConstructor | Function | true |
 | args | Array | true |
-| scope | Object | true |
 
 
 ```javascript
@@ -255,10 +253,10 @@ plug.factory("customResolver", function() {
     var instance;
 
      /* Implement the required getInstance method */
-    function getInstance (moduleConstructor, args, scope) {
+    function getInstance (moduleConstructor, args) {
 
         if (!instance) {
-            instance = moduleConstructor.apply(scope, args);
+            instance = moduleConstructor.apply(null, args);
         }
 
         return instance;
