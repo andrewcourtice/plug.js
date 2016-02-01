@@ -79,12 +79,6 @@
 </td>
 <td align="right">true</td>
 </tr>
-<tr>
-<td>scope</td>
-<td>Object</td>
-<td><code>this</code></td>
-<td align="right">false</td>
-</tr>
 </tbody>
 </table>
 
@@ -352,7 +346,7 @@
 </tbody>
 </table>
 
-<p><code>function getInstance(moduleConstructor, args, scope) { ... }</code></p>
+<p><code>function getInstance(moduleConstructor, args) { ... }</code></p>
 
 <table>
 <thead>
@@ -373,11 +367,6 @@
 <td>Array</td>
 <td align="right">true</td>
 </tr>
-<tr>
-<td>scope</td>
-<td>Object</td>
-<td align="right">true</td>
-</tr>
 </tbody>
 </table>
 
@@ -389,10 +378,10 @@
     <span class="pl-k">var</span> instance;
 
      <span class="pl-c">/* Implement the required getInstance method */</span>
-    <span class="pl-k">function</span> <span class="pl-en">getInstance</span> (<span class="pl-smi">moduleConstructor</span>, <span class="pl-smi">args</span>, <span class="pl-smi">scope</span>) {
+    <span class="pl-k">function</span> <span class="pl-en">getInstance</span> (<span class="pl-smi">moduleConstructor</span>, <span class="pl-smi">args</span>) {
 
         <span class="pl-k">if</span> (<span class="pl-k">!</span>instance) {
-            instance <span class="pl-k">=</span> <span class="pl-smi">moduleConstructor</span>.<span class="pl-c1">apply</span>(scope, args);
+            instance <span class="pl-k">=</span> <span class="pl-smi">moduleConstructor</span>.<span class="pl-c1">apply</span>(<span class="pl-c1">null</span>, args);
         }
 
         <span class="pl-k">return</span> instance;

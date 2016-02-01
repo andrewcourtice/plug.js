@@ -14,10 +14,6 @@ a {
   text-decoration: none; }
   a:hover {
     text-decoration: underline; }
-    
-table {
-  margin-bottom: 1rem;
-}
 
 .btn {
   display: inline-block;
@@ -37,10 +33,6 @@ table {
   text-decoration: none;
   background-color: rgba(255, 255, 255, 0.2);
   border-color: rgba(255, 255, 255, 0.3); }
-  
-.project-name {
-  font-weight: 500;
-}
 
 @media screen and (min-width: 64em) {
   .btn {
@@ -64,7 +56,8 @@ table {
 .page-header {
   color: #fff;
   text-align: center;
-  background-color: #3388C7; }
+  background-color: #159957;
+  background-image: linear-gradient(120deg, #155799, #159957); }
 
 @media screen and (min-width: 64em) {
   .page-header {
@@ -119,7 +112,7 @@ table {
   margin-top: 2rem;
   margin-bottom: 1rem;
   font-weight: normal;
-  color: #3388C7; }
+  color: #159957; }
 .main-content p {
   margin-bottom: 1em; }
 .main-content code {
