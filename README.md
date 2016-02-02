@@ -28,7 +28,7 @@ To use Plug.js it's as simple as registering modules and variables. By default P
 
 ### Usage
 
-`plug.singleton("moduleName", [ injectionSignature ], scope)`
+`plug.singleton("moduleName", [ injectionSignature ])` or `plug.transient("moduleName", [ injectionSignature ])`
 
 | Argument | Type | Example | Required |
 | -------- | ---- | ------- | -------: |
