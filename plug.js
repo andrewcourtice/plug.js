@@ -538,6 +538,7 @@
             /* Create a new factory method on the current instance for registering modules with this factory */
             this[cleanFactoryName] = function (moduleName, constructorArray) {
                 registerModule.call(this, moduleName, cleanFactoryName, constructorArray);
+                return this;
             }
         }
 
