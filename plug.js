@@ -3,7 +3,7 @@
 *   http://andrewcourtice.github.io/plug.js
 *   Copyright (c) 2016 Andrew Courtice
 *
-*   Version 1.0.0
+*   Version 1.0.3
 *
 *   Released under the MIT licence
 */
@@ -33,122 +33,22 @@
         },
 
         /**
-        * Helper object for performing object manipulation
-        *
-        * @param  {Object}
-        * @return {Object}
-        */
-        objectModifier = (function() {
+         * Method to construct new instances of objects
+         *
+         * @param  {Function} constructor The object's constructor
+         * @param  {Array} args An array of arguments for the object
+         * @return {Object}
+         */
+        construct = function (constructor, args) {
 
-            /**
-            * A helper method to clone objects
-            *
-            * @private
-            * @param  {Object} obj The object to be cloned
-            * @param  {Boolean} deepClone A boolean to indicate whether the method should recurse through the object tree
-            * @return {Object}
-            */
-            function cloneObject (obj, deepClone) {
-
-                /* Make sure we're working with an object */
-                if (typeof obj !== "object") {
-                    throw new Error("Value provided is not an object");
-                }
-
-                /* Define a base target object */
-                var clonedObj = {};
-
-                /* Add cloned properties to the target object and recurse if necessary */
-                for (var prop in obj) {
-                    if (obj.hasOwnProperty(prop)) {
-                        clonedObj[prop] = deepClone ? clone(obj[prop], deepClone) : obj[prop];
-                    }
-                }
-
-                return clonedObj;
+            function constructorWrapper() {
+                return constructor.apply(this, args);
             }
 
-            /**
-            * A helper method to clone an array
-            *
-            * @private
-            * @param  {Array} arr The array to be cloned
-            * @param  {Boolean} A boolean to indicate whether the method should recurse through the object tree
-            * @return {Array}
-            */
-            function cloneArray(arr, deepClone) {
+            constructorWrapper.prototype = constructor.prototype;
 
-                /* Make sure we're working with an array */
-                if (!isArray(arr)) {
-                    throw new Error("Value provided is not an array");
-                }
-
-                /* Map the array to a new array and recurse if necessary */
-                var clonedArr = arr.map(function (item) {
-                    return deepClone ? clone(item, deepClone) : item;
-                });
-
-                return clonedArr;
-            }
-
-            /**
-            * A helper method to clone a function
-            *
-            * @param  {Function} func The function to be cloned
-            * @return {Function}
-            */
-            function cloneFunction(func) {
-
-                /* Make sure we're working with a function */
-                if (typeof func !== "function") {
-                    throw new Error("Value provided is not a function");
-                }
-
-                return func.bind({});
-            }
-
-            /**
-            * A method for cloning objects
-            *
-            * @param  {Object} obj The object to be cloned
-            * @param  {Boolean} deepClone A boolean to indicate whether the method should recurse through the object tree
-            * @return {Object}
-            */
-            function clone (obj, deepClone) {
-
-                /* Default deep cloning to false */
-                deepClone = deepClone || false;
-
-                /* Test the object type and clone accordingly */
-                var clonedObj = obj;
-                switch (true) {
-                    case (obj instanceof Element && typeof obj === "object" && obj.nodeName):
-                        clonedObj = obj.cloneNode(deepClone);
-                        break;
-                        case (obj instanceof Object || typeof obj === "object"):
-                        clonedObj = cloneObject(obj, deepClone)
-                        break;
-                        case (obj instanceof Array || isArray(obj)):
-                        clonedObj = cloneArray(obj, deepClone);
-                        break;
-                        case (obj instanceof Function || typeof obj === "function"):
-                        clonedObj = cloneFunction(obj);
-                        break;
-                        case (obj instanceof Date):
-                        clonedObj = new Date();
-                        clonedObj.setTime(obj.getTime());
-                        break;
-                    }
-
-                    return clonedObj;
-                }
-
-                /* Expose public methods */
-                return {
-                    clone: clone
-                };
-
-        })(),
+            return new constructorWrapper();
+        },
 
         /**
         * An object for storing default factories to be attached to the current plug instance
@@ -168,7 +68,7 @@
 
                     /* If there is no instance stored on the factory, get one */
                     if (!instance) {
-                        instance = moduleConstructor.apply(this, args);
+                        instance = construct(moduleConstructor, args);
                     }
 
                     return instance;
@@ -186,8 +86,7 @@
 
                 /* Implement the required getInstance method */
                 function getInstance (moduleConstructor, args) {
-                    args.unshift(this);
-                    return new (Function.prototype.bind.apply(moduleConstructor, args));
+                    return construct(moduleConstructor, args);
                 }
 
                 /* Expose public methods */
@@ -197,6 +96,126 @@
 
             }
         };
+
+    /**
+     * A helper module for performing object manipulation
+     */
+    function ObjectModifier () {};
+
+    /**
+     * A helper module for performing object manipulation
+     */
+    ObjectModifier.prototype = (function() {
+
+        /**
+        * A helper method to clone objects
+        *
+        * @private
+        * @param  {Object} obj The object to be cloned
+        * @param  {Boolean} deepClone A boolean to indicate whether the method should recurse through the object tree
+        * @return {Object}
+        */
+        function cloneObject (obj, deepClone) {
+
+            /* Make sure we're working with an object */
+            if (typeof obj !== "object") {
+                throw new Error("Value provided is not an object");
+            }
+
+            /* Define a base target object */
+            var clonedObj = {};
+
+            /* Add cloned properties to the target object and recurse if necessary */
+            for (var prop in obj) {
+                if (obj.hasOwnProperty(prop)) {
+                    clonedObj[prop] = deepClone ? clone(obj[prop], deepClone) : obj[prop];
+                }
+            }
+
+            return clonedObj;
+        }
+
+        /**
+        * A helper method to clone an array
+        *
+        * @private
+        * @param  {Array} arr The array to be cloned
+        * @param  {Boolean} A boolean to indicate whether the method should recurse through the object tree
+        * @return {Array}
+        */
+        function cloneArray(arr, deepClone) {
+
+            /* Make sure we're working with an array */
+            if (!isArray(arr)) {
+                throw new Error("Value provided is not an array");
+            }
+
+            /* Map the array to a new array and recurse if necessary */
+            var clonedArr = arr.map(function (item) {
+                return deepClone ? clone(item, deepClone) : item;
+            });
+
+            return clonedArr;
+        }
+
+        /**
+        * A helper method to clone a function
+        *
+        * @param  {Function} func The function to be cloned
+        * @return {Function}
+        */
+        function cloneFunction(func) {
+
+            /* Make sure we're working with a function */
+            if (typeof func !== "function") {
+                throw new Error("Value provided is not a function");
+            }
+
+            return func.bind({});
+        }
+
+        /**
+        * A method for cloning objects
+        *
+        * @param  {Object} obj The object to be cloned
+        * @param  {Boolean} deepClone A boolean to indicate whether the method should recurse through the object tree
+        * @return {Object}
+        */
+        function clone (obj, deepClone) {
+
+            /* Default deep cloning to false */
+            deepClone = deepClone || false;
+
+            /* Test the object type and clone accordingly */
+            var clonedObj = obj;
+            switch (true) {
+                case (obj instanceof Element && typeof obj === "object" && obj.nodeName):
+                    clonedObj = obj.cloneNode(deepClone);
+                    break;
+                    case (obj instanceof Object || typeof obj === "object"):
+                    clonedObj = cloneObject(obj, deepClone)
+                    break;
+                    case (obj instanceof Array || isArray(obj)):
+                    clonedObj = cloneArray(obj, deepClone);
+                    break;
+                    case (obj instanceof Function || typeof obj === "function"):
+                    clonedObj = cloneFunction(obj);
+                    break;
+                    case (obj instanceof Date):
+                    clonedObj = new Date();
+                    clonedObj.setTime(obj.getTime());
+                    break;
+                }
+
+                return clonedObj;
+            }
+
+            /* Expose public methods */
+            return {
+                clone: clone
+            };
+
+    })();
 
     /**
      * A object for storing information about a registration
@@ -209,6 +228,9 @@
         this._value = value;
     };
 
+    /**
+     * A object for storing information about a registration
+     */
     Registration.prototype = (function() {
 
         /**
@@ -233,6 +255,9 @@
 
     })();
 
+    /**
+     * Register for maintaining injectables
+     */
     function Register () {
 
         /**
@@ -243,7 +268,9 @@
 
     };
 
-    /* Register for maintaining injectables */
+    /**
+     * Register for maintaining injectables
+     */
     Register.prototype = (function() {
 
         /**
@@ -330,7 +357,7 @@
     };
 
     /**
-     * FactoryStore prototype
+     * An Object to store factories
      */
     FactoryStore.prototype = (function() {
 
@@ -386,7 +413,7 @@
 
 
     /**
-     * A object for storing module properties and generating module instances
+     * An object for storing module properties and generating module instances
      *
      * @param {String} factoryName The name of the factory to be used to get an instance of this module
      * @param {Function} moduleConstructor The constructor method of the module
@@ -399,7 +426,7 @@
     }
 
     /**
-     * Module prototype
+     * An object for storing module properties and generating module instances
      */
     Module.prototype = (function () {
 
@@ -432,6 +459,7 @@
     function Plug () {
         this._register = new Register();
         this._factoryStore = new FactoryStore();
+        this._objectModifier = new ObjectModifier();
     }
 
     /**
@@ -494,7 +522,9 @@
          */
         function registerValue (name, value, deepClone) {
             var type = REGISTRATION_TYPE.injectable;
-            this._register.add(name, type, ObjectModifier.clone(value, deepClone));
+            var clonedValue = this._objectModifier.clone(value, deepClone);
+
+            this._register.add(name, type, clonedValue);
 
             /* Return the current plug instance for method chaining */
             return this;
@@ -597,7 +627,8 @@
 
         /* Inject references to the window and document objects */
         plug.reference("window", window)
-            .reference("document", document);
+            .reference("document", document)
+            .singleton("objectModifier", ObjectModifier);
 
         return plug;
     }
