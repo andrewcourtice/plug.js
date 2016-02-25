@@ -3,7 +3,7 @@
 *   http://andrewcourtice.github.io/plug.js
 *   Copyright (c) 2016 Andrew Courtice
 *
-*   Version 1.0.3
+*   Version 1.2.0
 *
 *   Released under the MIT licence
 */
@@ -210,9 +210,64 @@
                 return clonedObj;
             }
 
+            /**
+             * A method for merging two objects
+             *
+             * @param  {Object} targetObj The object to extend
+             * @param  {Object} sourceObj The root object
+             * @param  {Boolean} deepExtend Whether the extension should be recursive
+             * @return {Object}
+             */
+            function merge (targetObj, sourceObj, deepExtend) {
+
+                /* Defaul the target object */
+                targetObj = targetObj || {};
+
+                for (var prop in sourceObj) {
+
+                    /* Check the property of the source object */
+                    if (sourceObj.hasOwnProperty(prop)) {
+
+                        /* If deep extend is enabled and the source property is an object, recurse */
+                        if (deepExtend && typeof sourceObj[prop] === "object") {
+                            targetObj[prop] = merge(targetObj[prop], sourceObj[prop], true);
+                        } else {
+                            targetObj[prop] = sourceObj[prop];
+                        }
+                    }
+                }
+
+                /* Return the extended object */
+                return targetObj;
+            }
+
+            /**
+             * A method for extending an object with multiple child objects
+             * @param  {Object} obj The object to extend
+             * @param  {Array|Object} extensions An array of objects to merge with the source object
+             * @param  {Boolean} deepExtend Whether the extension should be recursive
+             * @return {Object}
+             */
+            function extend (obj, extensions, deepExtend) {
+
+                if (typeof obj !== "object") {
+                    throw new Error("Only objects can be extended");
+                }
+
+                var extensionArray = [].concat(extensions);
+
+                for (var i = 0; i < extensionArray.length; i++) {
+                    var sourceObj = extensionArray[i];
+                    merge(obj, sourceObj, deepExtend);
+                }
+
+                return obj;
+            }
+
             /* Expose public methods */
             return {
-                clone: clone
+                clone: clone,
+                extend: extend
             };
 
     })();
@@ -411,6 +466,65 @@
 
     })();
 
+    function PrototypeStore () {
+        this._prototypes = {};
+    };
+
+    PrototypeStore.prototype = (function () {
+
+        /**
+         * Checks to see if a prototype is registered
+         *
+         * @private
+         * @param  {String} name The name of the prototype
+         * @return {Boolean}
+         */
+        function isRegistered (name) {
+            return (typeof this._prototypes[name] !== "undefined");
+        }
+
+        function addPrototype (name, prototype) {
+            this._prototypes[name] = prototype;
+        }
+
+        function getPrototype (name) {
+
+            if (!isRegistered.call(this, name)) {
+                throw new Error("A prototype called " + name + " has not been registered");
+            }
+
+            return this._prototypes[name];
+        }
+
+        /**
+         * Retrieve a set of prototypes
+         *
+         * @param  {Array} names An array of names to get registrations for
+         * @return {Array}
+         */
+        function retrievePrototypes (names) {
+
+            /* Make sure the list of names is a valid array */
+            if (!isArray(names)) {
+                throw new Error("Must provide at least one name");
+            }
+
+            /* Resolve the registrations for the list of names provided */
+            var prototypes = [];
+            for (var i = 0; i < names.length; i++) {
+                var prototype = getPrototype.call(this, names[i]);
+                prototypes.push(prototype);
+            }
+
+            return prototypes;
+        }
+
+        return {
+            add: addPrototype,
+            retrieve: retrievePrototypes
+        };
+
+    })();
 
     /**
      * An object for storing module properties and generating module instances
@@ -459,6 +573,7 @@
     function Plug () {
         this._register = new Register();
         this._factoryStore = new FactoryStore();
+        this._prototypeStore = new PrototypeStore();
         this._objectModifier = new ObjectModifier();
     }
 
@@ -555,7 +670,7 @@
         function registerFactory (factoryName, factoryConstructor) {
 
             /* Check the factory name and the factory */
-            if (typeof factoryName === "undefined" || typeof factoryConstructor !== "function") {
+            if (typeof factoryName !== "string" || typeof factoryConstructor !== "function") {
                 throw new Error("A valid factory must be supplied")
             }
 
@@ -570,6 +685,25 @@
                 registerModule.call(this, moduleName, cleanFactoryName, constructorArray);
                 return this;
             }
+        }
+
+        /**
+         * A method to register a prototype
+         *
+         * @param  {String} name The name of the prototype to register
+         * @param  {Object} prototype The prototype to register
+         * @return {Undefined}
+         */
+        function registerPrototype (name, prototype) {
+
+            /* Check the prototype name and the prototype */
+            if (typeof name !== "string" || typeof prototype !== "object") {
+                throw new Error("A valid prototype must be supplied")
+            }
+
+            this._prototypeStore.add(name, prototype);
+
+            return this;
         }
 
         /**
@@ -605,6 +739,7 @@
             value: registerValue,
             reference: registerReference,
             factory: registerFactory,
+            from: registerPrototype,
             resolve: resolve
         };
 
