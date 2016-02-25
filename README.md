@@ -2,7 +2,7 @@
 
 Plug.js is a lightweight JavaScript dependency injection and object life-cycle management library. The purpose of Plug.js is to provide a flexible way to connect modules and share data between them without requiring a hard dependency on a framework or a steep learning curve.
 
-With no dependencies on third-party libraries, Plug.js weighs in at just 3kb (minified).
+With no dependencies on third-party libraries, Plug.js weighs in at just 5kb (minified).
 
 Plug.js' dependency registration uses a familiar RequireJS/AngularJS style signature making it quick and easy for developers with all different levels of experience to get up and running.
 
@@ -28,12 +28,13 @@ To use Plug.js it's as simple as registering modules and variables. By default P
 
 ### Usage
 
-`plug.singleton("moduleName", [ injectionSignature ])` or `plug.transient("moduleName", [ injectionSignature ])`
+`plug.singleton("moduleName", [ injectionSignature ], [ prototypes ])` or `plug.transient("moduleName", [ injectionSignature ], [ prototypes ])`
 
 | Argument | Type | Example | Required |
 | -------- | ---- | ------- | -------: |
 | moduleName | String | `"resourceModule"` | true |
 | injectionSignature | Array | `[ function () { ... } ]` **or** `[ "childModule", function(childModule) { ... } ]` | true |
+| prototypes | String **or** Array[String] | [ "animalPrototype", "carPrototype" ] | false |
 
 
 #### Singleton
@@ -44,9 +45,7 @@ plug.singleton("singletonModule", [ function() {
         alert("Did Something!");
     }
 
-    return {
-        doSomething: doSomething
-    };
+    this.doSomething = doSomething;
 
 } ]);
 ```
@@ -59,12 +58,13 @@ plug.transient("transientModule", [ function() {
         alert("Did Something!");
     }
 
-    return {
-        doSomething: doSomething
-    };
+    this.doSomething = doSomething;
 
 } ]);
 ```
+
+**Note**: The `objectModifier` module is injected (as a singleton) into each plug instance. The `objectModifier` module allows you to perform various operations on objects such as cloning and extending.
+
 
 ### Variables
 
