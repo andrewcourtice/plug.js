@@ -18,7 +18,9 @@
         delete: "DELETE"
     };
 
-    var Http = function () {
+    function Http () {};
+
+    Http.prototype = (function () {
 
         function executeRequest (method, url, data, callback) {
             var xhr = new XMLHttpRequest();
@@ -57,8 +59,8 @@
             delete: del
         };
 
-    };
+    })();
 
-    plug.singleton("http", Http);
+    plug.singleton("http", [ Http ]);
 
 })();
