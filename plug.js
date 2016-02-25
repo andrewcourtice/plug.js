@@ -41,13 +41,10 @@
          */
         construct = function (constructor, args) {
 
-            function constructorWrapper() {
-                return constructor.apply(this, args);
-            }
+            var obj = Object.create(constructor.prototype);
+            constructor.apply(obj, args);
 
-            constructorWrapper.prototype = constructor.prototype;
-
-            return new constructorWrapper();
+            return obj;
         },
 
         /**
@@ -504,10 +501,7 @@
          */
         function retrievePrototypes (names) {
 
-            /* Make sure the list of names is a valid array */
-            if (!isArray(names)) {
-                throw new Error("Must provide at least one name");
-            }
+            names = [].concat(names);
 
             /* Resolve the registrations for the list of names provided */
             var prototypes = [];
@@ -591,10 +585,10 @@
          * @param  {Array} constructorArray
          * @return {Undefined}
          */
-        function registerModule (moduleName, factoryName, constructorArray) {
+        function registerModule (moduleName, factoryName, constructorArray, prototypes) {
 
             /* Check the module name */
-            if (typeof moduleName === "undefined" || !isArray(constructorArray)) {
+            if (typeof moduleName !== "string" || !isArray(constructorArray)) {
                 throw new Error("Invalid module registration");
             }
 
@@ -616,6 +610,11 @@
 
             /* Get any dependencies for this module */
             var dependencies = this._register.retrieve(constructorArray);
+
+            if (prototypes) {
+                var registeredPrototypes = this._prototypeStore.retrieve(prototypes);
+                moduleConstructor.prototype = this._objectModifier.extend(moduleConstructor.prototype, registeredPrototypes);
+            }
 
             /* Create a new module object */
             var module = new Module(factory, moduleConstructor, dependencies);
@@ -681,8 +680,8 @@
             this._factoryStore.add(cleanFactoryName, factoryConstructor);
 
             /* Create a new factory method on the current instance for registering modules with this factory */
-            this[cleanFactoryName] = function (moduleName, constructorArray) {
-                registerModule.call(this, moduleName, cleanFactoryName, constructorArray);
+            this[cleanFactoryName] = function (moduleName, constructorArray, prototypes) {
+                registerModule.call(this, moduleName, cleanFactoryName, constructorArray, prototypes);
                 return this;
             }
         }
