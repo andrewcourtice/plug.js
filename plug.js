@@ -3,7 +3,7 @@
 *   http://andrewcourtice.github.io/plug.js
 *   Copyright (c) 2016 Andrew Courtice
 *
-*   Version 1.2.0
+*   Version 1.2.5
 *
 *   Released under the MIT licence
 */
@@ -41,10 +41,21 @@
          */
         construct = function (constructor, args) {
 
-            var obj = Object.create(constructor.prototype);
-            constructor.apply(obj, args);
+            /* Create a new wrapper for the constructor function */
+            var constructorWrapper = function() {};
 
-            return obj;
+            /* Set the wrappers prototype to the prototype of the constructor */
+            /* This is so we can return a new instance of the object with the same prototype */
+            constructorWrapper.prototype = constructor.prototype;
+
+            /* Get a new instance of the constructorWrapper */
+            var context = new constructorWrapper();
+
+            /* Call the constructor in the context of the constructorWrapper */
+            constructor.apply(context, args);
+
+            /* Return the context */
+            return context;
         },
 
         /**
