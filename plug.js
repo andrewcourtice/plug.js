@@ -763,7 +763,7 @@
         /* Inject references to the window and document objects */
         plug.reference("window", window)
             .reference("document", document)
-            .singleton("objectModifier", ObjectModifier);
+            .singleton("objectModifier", [ ObjectModifier ]);
 
         return plug;
     }
