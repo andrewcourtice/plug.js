@@ -1,0 +1,101 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 14;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 400;
+    line-height: 1.5em;
+    color: #454554;
+}
+
+*,
+*:before,
+*:after {
+    box-sizing: inherit;
+}
+
+.cf:before,
+.cf:after {
+    content: " ";
+    /* 1 */
+    display: table;
+    /* 2 */
+}
+
+.cf:after {
+    clear: both;
+}
+
+.container {
+    width: 640px;
+    margin: 36px auto 0 auto;
+    padding: -15px;
+}
+
+.column {
+    float: left;
+    padding: 15px;
+}
+
+.column-third {
+    width: 33.33%;
+}
+
+.column-half {
+    width: 50%;
+}
+
+.column-full {
+    width: 100%;
+}
+
+.column input[type="text"] {
+    width: 100%;
+}
+
+h2 {
+    margin: 0;
+}
+
+label {
+    display: block;
+    font-weight: 600;
+    font-size: 12px;
+    margin-bottom: 3px;
+}
+
+input[type="text"] {
+    padding: 8px 10px;
+    font-size: 1em;
+    font-family: 'Open Sans', sans-serif;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    outline: none;
+}
+
+input[type="text"]:focus {
+    border-color: #009baa;
+}
+
+input[type="text"]:invalid,
+input[type="email"]:invalid {
+    border-color: #de6060;
+}
+
+button {
+    padding: 12px 25px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #fff;
+    background-color: #009baa;
+    border: none;
+    border-radius: 2px;
+}
