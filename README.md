@@ -234,6 +234,9 @@ let's assume you have a module called `smartWatch`. A smart watch can be conside
 
 You can register a prototype on Plug.js using the `from` function.
 
+<script async src="//jsfiddle.net/andrewcourtice/26z3xo8a/embed/"></script>
+
+
 `plug.from("prototypeName", prototype)`
 
 | Argument | Type | Example | Required |
