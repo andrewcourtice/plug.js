@@ -63,7 +63,7 @@ plug.transient("transientModule", [ function() {
 } ]);
 ```
 
-**Note**: The `objectModifier` module is injected (as a singleton) into each plug instance. The `objectModifier` module allows you to perform various operations on objects such as cloning and extending.
+**Note**: The `oMod` module is injected (as a singleton) into each plug instance. The `oMod` module allows you to perform various operations on objects such as cloning and extending.
 
 
 ### Variables
@@ -224,6 +224,22 @@ plug.singleton("module2", [ "module1", function(module1) {
 var module2 = plug.resolve("module2");
 module2.saySomethingOnOtherModule("Hello World!");
 ```
+
+## Prototypes
+Plug.js' prototype management allows you to automate your modules inheritance. By adding prototypes to Plug.js you can assign any number of prototypes to your module when registering it. When the module is resolved, it's prototype is extended with the prototypes you assign to it.
+
+To visualize how this works consider this example:
+
+let's assume you have a module called `smartWatch`. A smart watch can be considered both a **watch** and a **smart device**. A watch has behaviors such as *displaying the time*, *start stopwatch* and *stop stopwatch*. A smart device has behaviors such as *connecting to Bluetooth*, *connecting to Wi-Fi*, *GPS tracking* and *charging*. The `smartWatch` module would encompass all of these behaviors, but you may also have some other modules such as `analogueWatch`, `digitalWatch`, `mobilePhone` and `fitnessBand` so the **watch** and **smart device** behaviors would need to be reusable across all of these modules. This is where prototypes are useful. Prototypes allow your modules to inherit properties or functions. Plug.js allows your modules to inherit the properties or functions of any number of prototypes automatically.
+
+You can register a prototype on Plug.js using the `from` function.
+
+`plug.from("prototypeName", prototype)`
+
+| Argument | Type | Example | Required |
+| -------- | ---- | ------- | -------: |
+| prototypeName | String | `"prototypeName"` | true |
+| prototype | Object | {} | true |
 
 ## Factories
 A Plug.js factory allow you to customize how your modules get resolved. As outlined above Plug.js provides two factories: singleton and transient. Your custom factory must expose a method called **getInstance**. The **getInstance** method takes three arguments: *moduleConstructor*, *args* and *scope*. See below on how the arguments are used to manage module lifecycle.
