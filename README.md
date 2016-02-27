@@ -288,3 +288,13 @@ plug.customResolver("module1", [ function() {
     /* ... */
 } ]);
 ```
+
+## Browser Compatibility
+
+| Browser | Version |
+| -------- | ---- | ------- | -------: |
+| Google Chrome | 7+ |
+| Mozilla Firefox | 4+ |
+| Opera | 11.6+ |
+| Internet Explorer | 9+ |
+| Apple Safari | 5.1+ |
