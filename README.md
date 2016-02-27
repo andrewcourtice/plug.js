@@ -7,6 +7,25 @@ With no dependencies on third-party libraries, Plug.js weighs in at just 5kb (mi
 Plug.js' dependency registration uses a familiar RequireJS/AngularJS style signature making it quick and easy for developers with all different levels of experience to get up and running.
 
 
+**Table of Contents**
+
+- [Plug.js](#)
+	- [The Facts](#)
+	- [Why use Plug.js?](#)
+	- [Get Plugging](#)
+		- [Usage](#)
+			- [Singleton](#)
+			- [Transient](#)
+		- [Variables](#)
+			- [Inject by Value](#)
+			- [Inject by Reference](#)
+	- [Resolving Registrations](#)
+	- [Dependencies](#)
+	- [Prototypes](#)
+	- [Factories](#)
+	- [Browser Compatibility](#)
+
+
 ## The Facts
 
 * Plug.js **is not** a module loader (*RequireJS*)
