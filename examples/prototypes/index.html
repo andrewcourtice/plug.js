@@ -19,11 +19,13 @@
         <div class="container cf">
         	<div class="column column-half">
         		<label for="ssid">Network Name</label>
-        		<input type="text" id="ssid" />
+        		<input type="text" id="ssid" required/>
+                <span class="validation-message">A Network Name is required!</span>
         	</div>
         	<div class="column column-half">
         		<label for="username">Username</label>
-        		<input type="text" id="username" />
+        		<input type="text" id="username" required/>
+                <span class="validation-message">A Username is required!</span>
         	</div>
         	<div class="column column-full">
         		<button id="wifi">Connect to Wifi</button>
@@ -32,7 +34,8 @@
         <div class="container cf">
         	<div class="column column-half">
         		<label for="device">Device Name</label>
-        		<input type="text" id="device" />
+        		<input type="text" id="device" required/>
+                <span class="validation-message">A Device Name is required!</span>
         	</div>
         	<div class="column column-full">
         		<button id="bluetooth">Connect to Bluetooth</button>

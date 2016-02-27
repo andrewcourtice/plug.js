@@ -13,7 +13,7 @@ body {
     font-family: 'Open Sans', sans-serif;
     font-weight: 400;
     line-height: 1.5em;
-    color: #454554;
+    color: #545468;
 }
 
 *,
@@ -61,8 +61,14 @@ body {
     width: 100%;
 }
 
-h2 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     margin: 0;
+    font-weight: 400;
 }
 
 label {
@@ -82,20 +88,39 @@ input[type="text"] {
 }
 
 input[type="text"]:focus {
-    border-color: #009baa;
+    border-color: #1E90FF;
 }
 
 input[type="text"]:invalid,
 input[type="email"]:invalid {
-    border-color: #de6060;
+    border-color: #E32739;
+}
+
+input[type="text"]:invalid + .validation-message,
+input[type="email"]:invalid + .validation-message {
+    display: block;
+}
+
+.validation-message {
+    display: none;
+    margin-top: 3px;
+    font-weight: 600;
+    font-size: 12px;
+    color: #E32739;
 }
 
 button {
     padding: 12px 25px;
+    font-family: inherit;
     font-weight: 600;
     cursor: pointer;
-    color: #fff;
-    background-color: #009baa;
+    color: #FFFFFF;
+    background-color: #1E90FF;
     border: none;
     border-radius: 2px;
+    outline: none;
+}
+
+button:focus {
+    box-shadow: 0 0 1px 2px rgba(30, 30, 30, 0.15);
 }

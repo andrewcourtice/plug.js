@@ -203,9 +203,7 @@ plug.singleton("module1", [ function() {
         alert(message);
     }
 
-    return {
-        saySomething: saySomething
-    };
+    this.saySomething = saySomething;
 
 } ]);
 
@@ -215,9 +213,7 @@ plug.singleton("module2", [ "module1", function(module1) {
         module1.saySomething(message);
     }
 
-    return {
-        saySomethingOnOtherModule: saySomethingOnOtherModule
-    };
+    this.saySomethingOnOtherModule = saySomethingOnOtherModule;
 
 } ]);
 
