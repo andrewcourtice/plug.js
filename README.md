@@ -9,21 +9,21 @@ Plug.js' dependency registration uses a familiar RequireJS/AngularJS style signa
 
 **Table of Contents**
 
-- [Plug.js](#)
-	- [The Facts](#)
-	- [Why use Plug.js?](#)
-	- [Get Plugging](#)
-		- [Usage](#)
-			- [Singleton](#)
-			- [Transient](#)
-		- [Variables](#)
-			- [Inject by Value](#)
-			- [Inject by Reference](#)
-	- [Resolving Registrations](#)
-	- [Dependencies](#)
-	- [Prototypes](#)
-	- [Factories](#)
-	- [Browser Compatibility](#)
+- [Plug.js](#plugjs)
+	- [The Facts](#the-facts)
+	- [Why use Plug.js?](#why-use-plugjs)
+	- [Get Plugging](#get-plugging)
+		- [Usage](#usage)
+			- [Singleton](#singleton)
+			- [Transient](#transient)
+		- [Variables](#variables)
+			- [Inject by Value](#inject-by-value)
+			- [Inject by Reference](#inject-by-reference)
+	- [Resolving Registrations](#resolving-registrations)
+	- [Dependencies](#dependencies)
+	- [Prototypes](#prototypes)
+	- [Factories](#factories)
+	- [Browser Compatibility](#browser-compatibility)
 
 
 ## The Facts
