@@ -47,7 +47,13 @@ To use Plug.js it's as simple as registering modules and variables. By default P
 
 ### Usage
 
-`plug.singleton("moduleName", [ injectionSignature ], [ prototypes ])` or `plug.transient("moduleName", [ injectionSignature ], [ prototypes ])`
+```javascript
+plug.singleton("moduleName", [ injectionSignature ], [ prototypes ])
+```
+**or**
+```javascript
+plug.transient("moduleName", [ injectionSignature ], [ prototypes ])
+```
 
 | Argument | Type | Example | Required |
 | -------- | ---- | ------- | -------: |
@@ -202,7 +208,7 @@ Plug.js uses a single method to resolve registered objects outside the context o
 ```javascript
 var fooBar = plug.resolve("moduleOrVariableName")
 ```
-or
+**or**
 ```javascript
 var fooBar = plug.resolve([ "module1", "module2", "value1", "module3" ])
 ```
