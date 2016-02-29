@@ -2,9 +2,28 @@
 
 Plug.js is a lightweight JavaScript dependency injection and object life-cycle management library. The purpose of Plug.js is to provide a flexible way to connect modules and share data between them without requiring a hard dependency on a framework or a steep learning curve.
 
-With no dependencies on third-party libraries, Plug.js weighs in at just 3kb (minified).
+With no dependencies on third-party libraries, Plug.js weighs in at just 5kb (minified).
 
 Plug.js' dependency registration uses a familiar RequireJS/AngularJS style signature making it quick and easy for developers with all different levels of experience to get up and running.
+
+
+**Table of Contents**
+
+- [Plug.js](#plugjs)
+	- [The Facts](#the-facts)
+	- [Why use Plug.js?](#why-use-plugjs)
+	- [Get Plugging](#get-plugging)
+		- [Usage](#usage)
+			- [Singleton](#singleton)
+			- [Transient](#transient)
+		- [Variables](#variables)
+			- [Inject by Value](#inject-by-value)
+			- [Inject by Reference](#inject-by-reference)
+	- [Resolving Registrations](#resolving-registrations)
+	- [Dependencies](#dependencies)
+	- [Prototypes](#prototypes)
+	- [Factories](#factories)
+	- [Browser Compatibility](#browser-compatibility)
 
 
 ## The Facts
@@ -28,12 +47,19 @@ To use Plug.js it's as simple as registering modules and variables. By default P
 
 ### Usage
 
-`plug.singleton("moduleName", [ injectionSignature ], scope)`
+```javascript
+plug.singleton("moduleName", [ injectionSignature ], [ prototypes ])
+```
+**or**
+```javascript
+plug.transient("moduleName", [ injectionSignature ], [ prototypes ])
+```
 
 | Argument | Type | Example | Required |
 | -------- | ---- | ------- | -------: |
 | moduleName | String | `"resourceModule"` | true |
-| injectionSignature | Array | `[ function () { ... } ]` **or** `[ "childModule", function(childModule) { ... } ]` | true |
+| injectionSignature | Array | `[ function () { ... } ]` **or** `[ "dependency", function(dependency) { ... } ]` | true |
+| prototypes | String **or** Array[String] | [ "animalPrototype", "carPrototype" ] | false |
 
 
 #### Singleton
@@ -44,9 +70,7 @@ plug.singleton("singletonModule", [ function() {
         alert("Did Something!");
     }
 
-    return {
-        doSomething: doSomething
-    };
+    this.doSomething = doSomething;
 
 } ]);
 ```
@@ -59,12 +83,13 @@ plug.transient("transientModule", [ function() {
         alert("Did Something!");
     }
 
-    return {
-        doSomething: doSomething
-    };
+    this.doSomething = doSomething;
 
 } ]);
 ```
+
+**Note**: The `oMod` module is injected (as a singleton) into each plug instance. The `oMod` module allows you to perform various operations on objects such as cloning and extending.
+
 
 ### Variables
 
@@ -183,7 +208,7 @@ Plug.js uses a single method to resolve registered objects outside the context o
 ```javascript
 var fooBar = plug.resolve("moduleOrVariableName")
 ```
-or
+**or**
 ```javascript
 var fooBar = plug.resolve([ "module1", "module2", "value1", "module3" ])
 ```
@@ -203,9 +228,7 @@ plug.singleton("module1", [ function() {
         alert(message);
     }
 
-    return {
-        saySomething: saySomething
-    };
+    this.saySomething = saySomething;
 
 } ]);
 
@@ -215,15 +238,32 @@ plug.singleton("module2", [ "module1", function(module1) {
         module1.saySomething(message);
     }
 
-    return {
-        saySomethingOnOtherModule: saySomethingOnOtherModule
-    };
+    this.saySomethingOnOtherModule = saySomethingOnOtherModule;
 
 } ]);
 
 var module2 = plug.resolve("module2");
 module2.saySomethingOnOtherModule("Hello World!");
 ```
+
+## Prototypes
+Plug.js' prototype management allows you to automate your modules inheritance. By adding prototypes to Plug.js you can assign any number of prototypes to your module when registering it. When the module is resolved, it's prototype is extended with the prototypes you assign to it.
+
+You can register a prototype on Plug.js using the `from` function.
+
+`plug.from("prototypeName", prototype)`
+
+| Argument | Type | Example | Required |
+| -------- | ---- | ------- | -------: |
+| prototypeName | String | `"prototypeName"` | true |
+| prototype | Object | {} | true |
+
+To visualize how this works consider this example:
+
+let's assume you have a module called `smartWatch`. A smart watch can be considered both a **watch** and a **smart device**. A watch has behaviors such as *displaying the time*, *start stopwatch* and *stop stopwatch*. A smart device has behaviors such as *connecting to Bluetooth*, *connecting to Wi-Fi*, *GPS tracking* and *charging*. The `smartWatch` module would encompass all of these behaviors, but you may also have some other modules such as `analogueWatch`, `digitalWatch`, `mobilePhone` and `fitnessBand` so the **watch** and **smart device** behaviors would need to be reusable across all of these modules. This is where prototypes are useful. Prototypes allow your modules to inherit properties or functions. Plug.js allows your modules to inherit the properties or functions of any number of prototypes automatically.
+
+The smart watch example described above is available as a demo app in the examples folder of this repository.
+
 
 ## Factories
 A Plug.js factory allow you to customize how your modules get resolved. As outlined above Plug.js provides two factories: singleton and transient. Your custom factory must expose a method called **getInstance**. The **getInstance** method takes three arguments: *moduleConstructor*, *args* and *scope*. See below on how the arguments are used to manage module lifecycle.
@@ -273,3 +313,13 @@ plug.customResolver("module1", [ function() {
     /* ... */
 } ]);
 ```
+
+## Browser Compatibility
+
+| Browser | Version |
+| -------- | ---- | ------- | -------: |
+| Google Chrome | 7+ |
+| Mozilla Firefox | 4+ |
+| Opera | 11.6+ |
+| Internet Explorer | 9+ |
+| Apple Safari | 5.1+ |
