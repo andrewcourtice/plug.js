@@ -58,7 +58,7 @@ plug.transient("moduleName", [ injectionSignature ], [ prototypes ])
 | Argument | Type | Example | Required |
 | -------- | ---- | ------- | -------: |
 | moduleName | String | `"resourceModule"` | true |
-| injectionSignature | Array | `[ function () { ... } ]` **or** `[ "childModule", function(childModule) { ... } ]` | true |
+| injectionSignature | Array | `[ function () { ... } ]` **or** `[ "dependency", function(dependency) { ... } ]` | true |
 | prototypes | String **or** Array[String] | [ "animalPrototype", "carPrototype" ] | false |
 
 
