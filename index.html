@@ -24,9 +24,49 @@
 
 <p>Plug.js is a lightweight JavaScript dependency injection and object life-cycle management library. The purpose of Plug.js is to provide a flexible way to connect modules and share data between them without requiring a hard dependency on a framework or a steep learning curve.</p>
 
-<p>With no dependencies on third-party libraries, Plug.js weighs in at just 3kb (minified).</p>
+<p>With no dependencies on third-party libraries, Plug.js weighs in at just 5kb (minified).</p>
 
 <p>Plug.js' dependency registration uses a familiar RequireJS/AngularJS style signature making it quick and easy for developers with all different levels of experience to get up and running.</p>
+
+<p><strong>Table of Contents</strong></p>
+
+<ul>
+<li>
+<a href="#plugjs">Plug.js</a>
+
+<ul>
+<li><a href="#the-facts">The Facts</a></li>
+<li><a href="#why-use-plugjs">Why use Plug.js?</a></li>
+<li>
+<a href="#get-plugging">Get Plugging</a>
+
+<ul>
+<li>
+<a href="#usage">Usage</a>
+
+<ul>
+<li><a href="#singleton">Singleton</a></li>
+<li><a href="#transient">Transient</a></li>
+</ul>
+</li>
+<li>
+<a href="#variables">Variables</a>
+
+<ul>
+<li><a href="#inject-by-value">Inject by Value</a></li>
+<li><a href="#inject-by-reference">Inject by Reference</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#resolving-registrations">Resolving Registrations</a></li>
+<li><a href="#dependencies">Dependencies</a></li>
+<li><a href="#prototypes">Prototypes</a></li>
+<li><a href="#factories">Factories</a></li>
+<li><a href="#browser-compatibility">Browser Compatibility</a></li>
+</ul>
+</li>
+</ul>
 
 <h2>
 <a id="the-facts" class="anchor" href="#the-facts" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>The Facts</h2>
@@ -53,7 +93,11 @@
 <h3>
 <a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h3>
 
-<p><code>plug.singleton("moduleName", [ injectionSignature ], scope)</code></p>
+<div class="highlight highlight-source-js"><pre><span class="pl-smi">plug</span>.<span class="pl-en">singleton</span>(<span class="pl-s"><span class="pl-pds">"</span>moduleName<span class="pl-pds">"</span></span>, [ injectionSignature ], [ prototypes ])</pre></div>
+
+<p><strong>or</strong></p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-smi">plug</span>.<span class="pl-en">transient</span>(<span class="pl-s"><span class="pl-pds">"</span>moduleName<span class="pl-pds">"</span></span>, [ injectionSignature ], [ prototypes ])</pre></div>
 
 <table>
 <thead>
@@ -75,9 +119,15 @@
 <td>injectionSignature</td>
 <td>Array</td>
 <td>
-<code>[ function () { ... } ]</code> <strong>or</strong> <code>[ "childModule", function(childModule) { ... } ]</code>
+<code>[ function () { ... } ]</code> <strong>or</strong> <code>[ "dependency", function(dependency) { ... } ]</code>
 </td>
 <td align="right">true</td>
+</tr>
+<tr>
+<td>prototypes</td>
+<td>String <strong>or</strong> Array[String]</td>
+<td>[ "animalPrototype", "carPrototype" ]</td>
+<td align="right">false</td>
 </tr>
 </tbody>
 </table>
@@ -88,12 +138,10 @@
 <div class="highlight highlight-source-js"><pre><span class="pl-smi">plug</span>.<span class="pl-en">singleton</span>(<span class="pl-s"><span class="pl-pds">"</span>singletonModule<span class="pl-pds">"</span></span>, [ <span class="pl-k">function</span>() {
 
     <span class="pl-k">function</span> <span class="pl-en">doSomething</span>() {
-        <span class="pl-c1">alert</span>(<span class="pl-s"><span class="pl-pds">"</span>Did Something!<span class="pl-pds">"</span></span>);
+        <span class="pl-en">alert</span>(<span class="pl-s"><span class="pl-pds">"</span>Did Something!<span class="pl-pds">"</span></span>);
     }
 
-    <span class="pl-k">return</span> {
-        doSomething<span class="pl-k">:</span> doSomething
-    };
+    <span class="pl-v">this</span>.<span class="pl-smi">doSomething</span> <span class="pl-k">=</span> doSomething;
 
 } ]);</pre></div>
 
@@ -103,14 +151,14 @@
 <div class="highlight highlight-source-js"><pre><span class="pl-smi">plug</span>.<span class="pl-en">transient</span>(<span class="pl-s"><span class="pl-pds">"</span>transientModule<span class="pl-pds">"</span></span>, [ <span class="pl-k">function</span>() {
 
     <span class="pl-k">function</span> <span class="pl-en">doSomething</span>() {
-        <span class="pl-c1">alert</span>(<span class="pl-s"><span class="pl-pds">"</span>Did Something!<span class="pl-pds">"</span></span>);
+        <span class="pl-en">alert</span>(<span class="pl-s"><span class="pl-pds">"</span>Did Something!<span class="pl-pds">"</span></span>);
     }
 
-    <span class="pl-k">return</span> {
-        doSomething<span class="pl-k">:</span> doSomething
-    };
+    <span class="pl-v">this</span>.<span class="pl-smi">doSomething</span> <span class="pl-k">=</span> doSomething;
 
 } ]);</pre></div>
+
+<p><strong>Note</strong>: The <code>oMod</code> module is injected (as a singleton) into each plug instance. The <code>oMod</code> module allows you to perform various operations on objects such as cloning and extending.</p>
 
 <h3>
 <a id="variables" class="anchor" href="#variables" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Variables</h3>
@@ -175,11 +223,11 @@
         ],
         bar<span class="pl-k">:</span> {
             <span class="pl-en">a</span><span class="pl-k">:</span> <span class="pl-k">function</span>() {
-                <span class="pl-c1">alert</span>(<span class="pl-s"><span class="pl-pds">"</span>foo bar<span class="pl-pds">"</span></span>);
+                <span class="pl-en">alert</span>(<span class="pl-s"><span class="pl-pds">"</span>foo bar<span class="pl-pds">"</span></span>);
             },
             b<span class="pl-k">:</span> {
                 <span class="pl-en">a</span><span class="pl-k">:</span> <span class="pl-k">function</span>() {
-                    <span class="pl-c1">alert</span>(<span class="pl-s"><span class="pl-pds">"</span>another foo bar<span class="pl-pds">"</span></span>);
+                    <span class="pl-en">alert</span>(<span class="pl-s"><span class="pl-pds">"</span>another foo bar<span class="pl-pds">"</span></span>);
                 }
             }
         }    
@@ -244,11 +292,11 @@
         ],
         bar<span class="pl-k">:</span> {
             <span class="pl-en">a</span><span class="pl-k">:</span> <span class="pl-k">function</span>() {
-                <span class="pl-c1">alert</span>(<span class="pl-s"><span class="pl-pds">"</span>foo bar<span class="pl-pds">"</span></span>);
+                <span class="pl-en">alert</span>(<span class="pl-s"><span class="pl-pds">"</span>foo bar<span class="pl-pds">"</span></span>);
             },
             b<span class="pl-k">:</span> {
                 <span class="pl-en">a</span><span class="pl-k">:</span> <span class="pl-k">function</span>() {
-                    <span class="pl-c1">alert</span>(<span class="pl-s"><span class="pl-pds">"</span>another foo bar<span class="pl-pds">"</span></span>);
+                    <span class="pl-en">alert</span>(<span class="pl-s"><span class="pl-pds">"</span>another foo bar<span class="pl-pds">"</span></span>);
                 }
             }
         }    
@@ -274,7 +322,7 @@
 
 <div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> fooBar <span class="pl-k">=</span> <span class="pl-smi">plug</span>.<span class="pl-en">resolve</span>(<span class="pl-s"><span class="pl-pds">"</span>moduleOrVariableName<span class="pl-pds">"</span></span>)</pre></div>
 
-<p>or</p>
+<p><strong>or</strong></p>
 
 <div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> fooBar <span class="pl-k">=</span> <span class="pl-smi">plug</span>.<span class="pl-en">resolve</span>([ <span class="pl-s"><span class="pl-pds">"</span>module1<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>module2<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>value1<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>module3<span class="pl-pds">"</span></span> ])</pre></div>
 
@@ -290,12 +338,10 @@
 <div class="highlight highlight-source-js"><pre><span class="pl-smi">plug</span>.<span class="pl-en">singleton</span>(<span class="pl-s"><span class="pl-pds">"</span>module1<span class="pl-pds">"</span></span>, [ <span class="pl-k">function</span>() {
 
     <span class="pl-k">function</span> <span class="pl-en">saySomething</span>(<span class="pl-smi">message</span>) {
-        <span class="pl-c1">alert</span>(message);
+        <span class="pl-en">alert</span>(message);
     }
 
-    <span class="pl-k">return</span> {
-        saySomething<span class="pl-k">:</span> saySomething
-    };
+    <span class="pl-v">this</span>.<span class="pl-smi">saySomething</span> <span class="pl-k">=</span> saySomething;
 
 } ]);
 
@@ -305,14 +351,52 @@
         <span class="pl-smi">module1</span>.<span class="pl-en">saySomething</span>(message);
     }
 
-    <span class="pl-k">return</span> {
-        saySomethingOnOtherModule<span class="pl-k">:</span> saySomethingOnOtherModule
-    };
+    <span class="pl-v">this</span>.<span class="pl-smi">saySomethingOnOtherModule</span> <span class="pl-k">=</span> saySomethingOnOtherModule;
 
 } ]);
 
 <span class="pl-k">var</span> module2 <span class="pl-k">=</span> <span class="pl-smi">plug</span>.<span class="pl-en">resolve</span>(<span class="pl-s"><span class="pl-pds">"</span>module2<span class="pl-pds">"</span></span>);
 <span class="pl-smi">module2</span>.<span class="pl-en">saySomethingOnOtherModule</span>(<span class="pl-s"><span class="pl-pds">"</span>Hello World!<span class="pl-pds">"</span></span>);</pre></div>
+
+<h2>
+<a id="prototypes" class="anchor" href="#prototypes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Prototypes</h2>
+
+<p>Plug.js' prototype management allows you to automate your modules inheritance. By adding prototypes to Plug.js you can assign any number of prototypes to your module when registering it. When the module is resolved, it's prototype is extended with the prototypes you assign to it.</p>
+
+<p>You can register a prototype on Plug.js using the <code>from</code> function.</p>
+
+<p><code>plug.from("prototypeName", prototype)</code></p>
+
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Example</th>
+<th align="right">Required</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>prototypeName</td>
+<td>String</td>
+<td><code>"prototypeName"</code></td>
+<td align="right">true</td>
+</tr>
+<tr>
+<td>prototype</td>
+<td>Object</td>
+<td>{}</td>
+<td align="right">true</td>
+</tr>
+</tbody>
+</table>
+
+<p>To visualize how this works consider this example:</p>
+
+<p>let's assume you have a module called <code>smartWatch</code>. A smart watch can be considered both a <strong>watch</strong> and a <strong>smart device</strong>. A watch has behaviors such as <em>displaying the time</em>, <em>start stopwatch</em> and <em>stop stopwatch</em>. A smart device has behaviors such as <em>connecting to Bluetooth</em>, <em>connecting to Wi-Fi</em>, <em>GPS tracking</em> and <em>charging</em>. The <code>smartWatch</code> module would encompass all of these behaviors, but you may also have some other modules such as <code>analogueWatch</code>, <code>digitalWatch</code>, <code>mobilePhone</code> and <code>fitnessBand</code> so the <strong>watch</strong> and <strong>smart device</strong> behaviors would need to be reusable across all of these modules. This is where prototypes are useful. Prototypes allow your modules to inherit properties or functions. Plug.js allows your modules to inherit the properties or functions of any number of prototypes automatically.</p>
+
+<p>The smart watch example described above is available as a demo app in the examples folder of this repository.</p>
 
 <h2>
 <a id="factories" class="anchor" href="#factories" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Factories</h2>
@@ -397,6 +481,40 @@
 <span class="pl-smi">plug</span>.<span class="pl-en">customResolver</span>(<span class="pl-s"><span class="pl-pds">"</span>module1<span class="pl-pds">"</span></span>, [ <span class="pl-k">function</span>() {
     <span class="pl-c">/* ... */</span>
 } ]);</pre></div>
+
+<h2>
+<a id="browser-compatibility" class="anchor" href="#browser-compatibility" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Browser Compatibility</h2>
+
+<table>
+<thead>
+<tr>
+<th>Browser</th>
+<th>Version</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Google Chrome</td>
+<td>7+</td>
+</tr>
+<tr>
+<td>Mozilla Firefox</td>
+<td>4+</td>
+</tr>
+<tr>
+<td>Opera</td>
+<td>11.6+</td>
+</tr>
+<tr>
+<td>Internet Explorer</td>
+<td>9+</td>
+</tr>
+<tr>
+<td>Apple Safari</td>
+<td>5.1+</td>
+</tr>
+</tbody>
+</table>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/andrewcourtice/plug.js">Plug.js</a> is maintained by <a href="https://github.com/andrewcourtice">andrewcourtice</a>.</span>
