@@ -3,7 +3,7 @@
 *   http://andrewcourtice.github.io/plug.js
 *   Copyright (c) 2016 Andrew Courtice
 *
-*   Version 1.2.5
+*   Version 1.3.0
 *
 *   Released under the MIT licence
 */
@@ -29,7 +29,8 @@
         */
         REGISTRATION_TYPE = {
             module: 1,
-            injectable: 2
+            injectable: 2,
+            objectPrototype: 3
         },
 
         /**
@@ -474,63 +475,6 @@
 
     })();
 
-    function PrototypeStore () {
-        this._prototypes = {};
-    };
-
-    PrototypeStore.prototype = (function () {
-
-        /**
-         * Checks to see if a prototype is registered
-         *
-         * @private
-         * @param  {String} name The name of the prototype
-         * @return {Boolean}
-         */
-        function isRegistered (name) {
-            return (typeof this._prototypes[name] !== "undefined");
-        }
-
-        function addPrototype (name, prototype) {
-            this._prototypes[name] = prototype;
-        }
-
-        function getPrototype (name) {
-
-            if (!isRegistered.call(this, name)) {
-                throw new Error("A prototype called " + name + " has not been registered");
-            }
-
-            return this._prototypes[name];
-        }
-
-        /**
-         * Retrieve a set of prototypes
-         *
-         * @param  {Array} names An array of names to get registrations for
-         * @return {Array}
-         */
-        function retrievePrototypes (names) {
-
-            names = [].concat(names);
-
-            /* Resolve the registrations for the list of names provided */
-            var prototypes = [];
-            for (var i = 0; i < names.length; i++) {
-                var prototype = getPrototype.call(this, names[i]);
-                prototypes.push(prototype);
-            }
-
-            return prototypes;
-        }
-
-        return {
-            add: addPrototype,
-            retrieve: retrievePrototypes
-        };
-
-    })();
-
     /**
      * An object for storing module properties and generating module instances
      *
@@ -578,7 +522,6 @@
     function Plug () {
         this._register = new Register();
         this._factoryStore = new FactoryStore();
-        this._prototypeStore = new PrototypeStore();
         this._objectModifier = new ObjectModifier();
     }
 
@@ -623,8 +566,17 @@
             var dependencies = this._register.retrieve(constructorArray);
 
             if (prototypes) {
-                var registeredPrototypes = this._prototypeStore.retrieve(prototypes);
-                moduleConstructor.prototype = this._objectModifier.extend(moduleConstructor.prototype, registeredPrototypes);
+
+                /* Get the registered prototypes */
+                var prototypeRegistrations = this._register.retrieve(prototypes);
+
+                /* Map the registered prototype resolutions to a new array so that the root prototype can be extended */
+                var rawPrototypes = prototypeRegistrations.map(function (prototypeRegistration) {
+                    return prototypeRegistration.resolution.getValue();
+                });
+
+                /* Assign the extended prototype as the root prototype */
+                moduleConstructor.prototype = this._objectModifier.extend(moduleConstructor.prototype, rawPrototypes);
             }
 
             /* Create a new module object */
@@ -711,7 +663,7 @@
                 throw new Error("A valid prototype must be supplied")
             }
 
-            this._prototypeStore.add(name, prototype);
+            this._register.add(name, REGISTRATION_TYPE.objectPrototype, prototype);
 
             return this;
         }
@@ -773,7 +725,7 @@
         /* Inject references to the window and document objects */
         plug.reference("window", window)
             .reference("document", document)
-            .singleton("objectModifier", [ ObjectModifier ]);
+            .singleton("oMod", [ ObjectModifier ]);
 
         return plug;
     }
