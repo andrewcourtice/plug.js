@@ -66,11 +66,9 @@ plug.transient("moduleName", [ injectionSignature ], [ prototypes ])
 ```javascript
 plug.singleton("singletonModule", [ function() {
 
-    function doSomething() {
+    this.doSomething = function() {
         alert("Did Something!");
-    }
-
-    this.doSomething = doSomething;
+    };
 
 } ]);
 ```
@@ -79,11 +77,9 @@ plug.singleton("singletonModule", [ function() {
 ```javascript
 plug.transient("transientModule", [ function() {
 
-    function doSomething() {
+    this.doSomething = function() {
         alert("Did Something!");
-    }
-
-    this.doSomething = doSomething;
+    };
 
 } ]);
 ```
@@ -99,7 +95,7 @@ Injecting a variable by value will inform Plug.js to create a clone of the objec
 
 Injecting a variable by reference will inform Plug.js to treat the object normally and inject the reference to the variable into the module (*JavaScript's default behaviour for reference types*).
 
-**Note**: A locally scoped reference to the `window` and the `document` objects are injected into modules by default. You can use these locally scoped variables by simply declaring them as a dependency to your module.
+**Note**: A locally scoped reference to the `window` and the `document` objects are injected into modules by default. You can use these locally scoped variables by simply declaring them as a dependency to your module. If you need to do a large number of operations on the DOM I recommend using the locally scoped `document` variable in your module. Using locally scoped variables from the global namespace has a significant performance benefit. Without going into too much detail, this is because the browser will look for variables in the local scope before propagating up the scope chain to the global namespace. Therefor, depending on how far down the call-stack your calling routine is, this can have a significant performance benefit.
 
 #### Inject by Value
 
@@ -224,21 +220,17 @@ When registering a module you can define any other modules or registered variabl
 ```javascript
 plug.singleton("module1", [ function() {
 
-    function saySomething(message) {
+    this.saySomething = function(message) {
         alert(message);
-    }
-
-    this.saySomething = saySomething;
+    };
 
 } ]);
 
 plug.singleton("module2", [ "module1", function(module1) {
 
-    function saySomethingOnOtherModule(message) {
+    this.saySomethingOnOtherModule = function(message) {
         module1.saySomething(message);
-    }
-
-    this.saySomethingOnOtherModule = saySomethingOnOtherModule;
+    };
 
 } ]);
 
@@ -266,7 +258,7 @@ The smart watch example described above is available as a demo app in the exampl
 
 
 ## Factories
-A Plug.js factory allow you to customize how your modules get resolved. As outlined above Plug.js provides two factories: singleton and transient. Your custom factory must expose a method called **getInstance**. The **getInstance** method takes three arguments: *moduleConstructor*, *args* and *scope*. See below on how the arguments are used to manage module lifecycle.
+A Plug.js factory allows you to customize how your modules get resolved. As outlined above, Plug.js provides two factories: singleton and transient. Your custom factory must expose a method called **getInstance**. The **getInstance** method takes two arguments: *moduleConstructor*, *args*. See below on how the arguments are used to manage module lifecycle.
 
 `plug.factory("factoryName", factoryConstructor)`
 
