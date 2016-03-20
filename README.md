@@ -13,6 +13,8 @@ Plug.js' dependency registration uses a familiar RequireJS/AngularJS style signa
 	- [The Facts](#the-facts)
 	- [Why use Plug.js?](#why-use-plugjs)
 	- [Get Plugging](#get-plugging)
+		- [Manual Installation](#manual-installation)
+		- [Nuget](#nuget)
 		- [Usage](#usage)
 			- [Singleton](#singleton)
 			- [Transient](#transient)
@@ -41,11 +43,18 @@ Plug.js is designed to encourage less dependencies on frameworks that are often 
 
 ## Get Plugging
 
+### Manual Installation
+
 First, download the Plug.js file or Plug.min.js (*recommended*) file and include it in your page either in the `<head>` section or just before the closing tag of the `<body>` section.
 
-To use Plug.js it's as simple as registering modules and variables. By default Plug.js provides two type of lifecycle factories (*explained below*): **singleton** and **transient**. A singleton registration will ensure only a single instance of the registered module is ever resolved, while a transient registration will return a new instance of the module each time it is resolved.
+### Nuget
+```
+PM> Install-Package Plug.js
+```
 
 ### Usage
+
+To use Plug.js it's as simple as registering modules and variables. By default Plug.js provides two type of lifecycle factories (*explained below*): **singleton** and **transient**. A singleton registration will ensure only a single instance of the registered module is ever resolved, while a transient registration will return a new instance of the module each time it is resolved.
 
 ```javascript
 plug.singleton("moduleName", [ injectionSignature ], [ prototypes ])
