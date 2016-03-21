@@ -14,6 +14,7 @@ Plug.js' dependency registration uses a familiar RequireJS/AngularJS style signa
 	- [Why use Plug.js?](#why-use-plugjs)
 	- [Get Plugging](#get-plugging)
 		- [Manual Installation](#manual-installation)
+		- [Bower](#bower)
 		- [Nuget](#nuget)
 		- [Usage](#usage)
 			- [Singleton](#singleton)
@@ -45,7 +46,12 @@ Plug.js is designed to encourage less dependencies on frameworks that are often 
 
 ### Manual Installation
 
-First, download the Plug.js file or Plug.min.js (*recommended*) file and include it in your page either in the `<head>` section or just before the closing tag of the `<body>` section.
+Download the **Plug.js** file or **Plug.min.js** (*recommended*) file and include it in your page either in the `<head>` section or just before the closing tag of the `<body>` section.
+
+### Bower
+```
+$ bower install Plug.js
+```
 
 ### Nuget
 ```
