@@ -3,7 +3,7 @@
 *   http://andrewcourtice.github.io/plug.js
 *   Copyright (c) 2016 Andrew Courtice
 *
-*   Version 1.3.0
+*   Version 1.5.0
 *
 *   Released under the MIT licence
 */
