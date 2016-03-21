@@ -2,7 +2,7 @@
 
 Plug.js is a lightweight JavaScript dependency injection and object life-cycle management library. The purpose of Plug.js is to provide a flexible way to connect modules and share data between them without requiring a hard dependency on a framework or a steep learning curve.
 
-With no dependencies on third-party libraries, Plug.js weighs in at just 5kb (minified).
+With no dependencies on third-party libraries, Plug.js weighs in at just 4.2kb (minified).
 
 Plug.js' dependency registration uses a familiar RequireJS/AngularJS style signature making it quick and easy for developers with all different levels of experience to get up and running.
 
