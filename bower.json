@@ -1,0 +1,24 @@
+{
+  "name": "Plug.js",
+  "homepage": "https://github.com/andrewcourtice/plug.js",
+  "authors": [
+    "Andrew Courtice <andrewcourtice@gmail.com>"
+  ],
+  "description": "Plug.js is a lightweight JavaScript dependency injection and object life-cycle management library",
+  "main": "plug.js",
+  "moduleType": [],
+  "keywords": [
+    "plug",
+    "javascript",
+    "dependency",
+    "injection",
+    "lifecycle"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "bower.json"
+    "README.md"
+    "examples",
+    "modules/*.md"
+  ]
+}
