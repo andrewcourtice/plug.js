@@ -24,7 +24,7 @@
 
 <p>Plug.js is a lightweight JavaScript dependency injection and object life-cycle management library. The purpose of Plug.js is to provide a flexible way to connect modules and share data between them without requiring a hard dependency on a framework or a steep learning curve.</p>
 
-<p>With no dependencies on third-party libraries, Plug.js weighs in at just 5kb (minified).</p>
+<p>With no dependencies on third-party libraries, Plug.js weighs in at just 4.2kb (minified).</p>
 
 <p>Plug.js' dependency registration uses a familiar RequireJS/AngularJS style signature making it quick and easy for developers with all different levels of experience to get up and running.</p>
 
@@ -41,6 +41,9 @@
 <a href="#get-plugging">Get Plugging</a>
 
 <ul>
+<li><a href="#manual-installation">Manual Installation</a></li>
+<li><a href="#bower">Bower</a></li>
+<li><a href="#nuget">Nuget</a></li>
 <li>
 <a href="#usage">Usage</a>
 
@@ -86,12 +89,27 @@
 <h2>
 <a id="get-plugging" class="anchor" href="#get-plugging" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Get Plugging</h2>
 
-<p>First, download the Plug.js file or Plug.min.js (<em>recommended</em>) file and include it in your page either in the <code>&lt;head&gt;</code> section or just before the closing tag of the <code>&lt;body&gt;</code> section.</p>
+<h3>
+<a id="manual-installation" class="anchor" href="#manual-installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Manual Installation</h3>
 
-<p>To use Plug.js it's as simple as registering modules and variables. By default Plug.js provides two type of lifecycle factories (<em>explained below</em>): <strong>singleton</strong> and <strong>transient</strong>. A singleton registration will ensure only a single instance of the registered module is ever resolved, while a transient registration will return a new instance of the module each time it is resolved.</p>
+<p>Download the <strong>Plug.js</strong> file or <strong>Plug.min.js</strong> (<em>recommended</em>) file and include it in your page either in the <code>&lt;head&gt;</code> section or just before the closing tag of the <code>&lt;body&gt;</code> section.</p>
+
+<h3>
+<a id="bower" class="anchor" href="#bower" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Bower</h3>
+
+<pre><code>$ bower install Plug.js
+</code></pre>
+
+<h3>
+<a id="nuget" class="anchor" href="#nuget" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Nuget</h3>
+
+<pre><code>PM&gt; Install-Package Plug.js
+</code></pre>
 
 <h3>
 <a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h3>
+
+<p>To use Plug.js it's as simple as registering modules and variables. By default Plug.js provides two type of lifecycle factories (<em>explained below</em>): <strong>singleton</strong> and <strong>transient</strong>. A singleton registration will ensure only a single instance of the registered module is ever resolved, while a transient registration will return a new instance of the module each time it is resolved.</p>
 
 <div class="highlight highlight-source-js"><pre><span class="pl-smi">plug</span>.<span class="pl-en">singleton</span>(<span class="pl-s"><span class="pl-pds">"</span>moduleName<span class="pl-pds">"</span></span>, [ injectionSignature ], [ prototypes ])</pre></div>
 
@@ -137,11 +155,9 @@
 
 <div class="highlight highlight-source-js"><pre><span class="pl-smi">plug</span>.<span class="pl-en">singleton</span>(<span class="pl-s"><span class="pl-pds">"</span>singletonModule<span class="pl-pds">"</span></span>, [ <span class="pl-k">function</span>() {
 
-    <span class="pl-k">function</span> <span class="pl-en">doSomething</span>() {
+    <span class="pl-v">this</span>.<span class="pl-en">doSomething</span> <span class="pl-k">=</span> <span class="pl-k">function</span>() {
         <span class="pl-en">alert</span>(<span class="pl-s"><span class="pl-pds">"</span>Did Something!<span class="pl-pds">"</span></span>);
-    }
-
-    <span class="pl-v">this</span>.<span class="pl-smi">doSomething</span> <span class="pl-k">=</span> doSomething;
+    };
 
 } ]);</pre></div>
 
@@ -150,11 +166,9 @@
 
 <div class="highlight highlight-source-js"><pre><span class="pl-smi">plug</span>.<span class="pl-en">transient</span>(<span class="pl-s"><span class="pl-pds">"</span>transientModule<span class="pl-pds">"</span></span>, [ <span class="pl-k">function</span>() {
 
-    <span class="pl-k">function</span> <span class="pl-en">doSomething</span>() {
+    <span class="pl-v">this</span>.<span class="pl-en">doSomething</span> <span class="pl-k">=</span> <span class="pl-k">function</span>() {
         <span class="pl-en">alert</span>(<span class="pl-s"><span class="pl-pds">"</span>Did Something!<span class="pl-pds">"</span></span>);
-    }
-
-    <span class="pl-v">this</span>.<span class="pl-smi">doSomething</span> <span class="pl-k">=</span> doSomething;
+    };
 
 } ]);</pre></div>
 
@@ -169,7 +183,7 @@
 
 <p>Injecting a variable by reference will inform Plug.js to treat the object normally and inject the reference to the variable into the module (<em>JavaScript's default behaviour for reference types</em>).</p>
 
-<p><strong>Note</strong>: A locally scoped reference to the <code>window</code> and the <code>document</code> objects are injected into modules by default. You can use these locally scoped variables by simply declaring them as a dependency to your module.</p>
+<p><strong>Note</strong>: A locally scoped reference to the <code>window</code> and the <code>document</code> objects are injected into modules by default. You can use these locally scoped variables by simply declaring them as a dependency to your module. If you need to do a large number of operations on the DOM I recommend using the locally scoped <code>document</code> variable in your module. Using locally scoped variables from the global namespace has a significant performance benefit. Without going into too much detail, this is because the browser will look for variables in the local scope before propagating up the scope chain to the global namespace. Therefor, depending on how far down the call-stack your calling routine is, this can have a significant performance benefit.</p>
 
 <h4>
 <a id="inject-by-value" class="anchor" href="#inject-by-value" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Inject by Value</h4>
@@ -337,21 +351,17 @@
 
 <div class="highlight highlight-source-js"><pre><span class="pl-smi">plug</span>.<span class="pl-en">singleton</span>(<span class="pl-s"><span class="pl-pds">"</span>module1<span class="pl-pds">"</span></span>, [ <span class="pl-k">function</span>() {
 
-    <span class="pl-k">function</span> <span class="pl-en">saySomething</span>(<span class="pl-smi">message</span>) {
+    <span class="pl-v">this</span>.<span class="pl-en">saySomething</span> <span class="pl-k">=</span> <span class="pl-k">function</span>(<span class="pl-smi">message</span>) {
         <span class="pl-en">alert</span>(message);
-    }
-
-    <span class="pl-v">this</span>.<span class="pl-smi">saySomething</span> <span class="pl-k">=</span> saySomething;
+    };
 
 } ]);
 
 <span class="pl-smi">plug</span>.<span class="pl-en">singleton</span>(<span class="pl-s"><span class="pl-pds">"</span>module2<span class="pl-pds">"</span></span>, [ <span class="pl-s"><span class="pl-pds">"</span>module1<span class="pl-pds">"</span></span>, <span class="pl-k">function</span>(<span class="pl-smi">module1</span>) {
 
-    <span class="pl-k">function</span> <span class="pl-en">saySomethingOnOtherModule</span>(<span class="pl-smi">message</span>) {
+    <span class="pl-v">this</span>.<span class="pl-en">saySomethingOnOtherModule</span> <span class="pl-k">=</span> <span class="pl-k">function</span>(<span class="pl-smi">message</span>) {
         <span class="pl-smi">module1</span>.<span class="pl-en">saySomething</span>(message);
-    }
-
-    <span class="pl-v">this</span>.<span class="pl-smi">saySomethingOnOtherModule</span> <span class="pl-k">=</span> saySomethingOnOtherModule;
+    };
 
 } ]);
 
@@ -401,7 +411,7 @@
 <h2>
 <a id="factories" class="anchor" href="#factories" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Factories</h2>
 
-<p>A Plug.js factory allow you to customize how your modules get resolved. As outlined above Plug.js provides two factories: singleton and transient. Your custom factory must expose a method called <strong>getInstance</strong>. The <strong>getInstance</strong> method takes three arguments: <em>moduleConstructor</em>, <em>args</em> and <em>scope</em>. See below on how the arguments are used to manage module lifecycle.</p>
+<p>A Plug.js factory allows you to customize how your modules get resolved. As outlined above, Plug.js provides two factories: singleton and transient. Your custom factory must expose a method called <strong>getInstance</strong>. The <strong>getInstance</strong> method takes two arguments: <em>moduleConstructor</em>, <em>args</em>. See below on how the arguments are used to manage module lifecycle.</p>
 
 <p><code>plug.factory("factoryName", factoryConstructor)</code></p>
 
